@@ -2,6 +2,7 @@ const guruRepo = require("../repository/teacher.repo.js");
 const { TeacherEntity } = require("../models/teacher.model.js");
 
 function findAllGuru(req, res) {
+  console.log("Teacher Controller Launched 😎");
   guruRepo.findAll(function (err, result) {
     if (err) {
       return res.status(400).json({
@@ -18,6 +19,8 @@ function findAllGuru(req, res) {
 }
 
 function createGuru(req, res) {
+  console.log("Teacher Controller Launched 😎");
+
   const { nama, umur, mengajar, status_guru, rating } = req.body;
 
   const guru = new TeacherEntity(nama, umur, mengajar, status_guru, rating);
