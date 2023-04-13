@@ -7,7 +7,6 @@ const { Routes } = require("./src/routes/routes");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-
 Routes(app);
 
 app.listen(port, () => {
