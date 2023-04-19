@@ -1,7 +1,6 @@
 const auth = require("../repository/auth.repo.js");
 const bcrypt = require("bcrypt");
-
-const { UserEntity } = require("../models/auth.model.js");
+const jwt = require("jsonwebtoken");
 
 function signIn(req, res) {
   console.log("Auth Controller Launched 😎");
@@ -16,8 +15,21 @@ function signIn(req, res) {
         const hash = result[0].password;
         const compare = bcrypt.compareSync(password, hash);
         if (compare) {
+          var token = jwt.sign(
+            {
+              exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+              data: {
+                id: result[0].id,
+                nama: result[0].nama,
+                role: result[0].status_role,
+              },
+            },
+            "dev_token"
+          );
+
           return res.status(200).json({
-            statusLogin: "LOGIN",
+            status: 200,
+            accessToken: token,
             message: "Successfully Login",
           });
         } else {
@@ -25,6 +37,10 @@ function signIn(req, res) {
             message: "Username or Password Incorrect",
           });
         }
+      } else {
+        return res.status(400).json({
+          message: "Username Not Found",
+        });
       }
     }
   });
@@ -38,9 +54,9 @@ function signUp(req, res) {
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(password, salt);
 
-  const userModel = new UserEntity(nama, username, hash, "Agent/Develop");
+  // const userModel = new UserEntity(nama, username, hash, "Agent/Develop");
 
-  auth.signUp(userModel, function (err, result) {
+  auth.signUp(nama, username, hash, userAgent, function (err, result) {
     if (err) {
       return res.status(400).json({
         message: "Something went wrong",
@@ -53,4 +69,27 @@ function signUp(req, res) {
   });
 }
 
-module.exports = { signUp, signIn };
+function getDataJWT(req, res) {
+  console.log("Auth Controller Launched 😎");
+  const token = req.headers["x-access-token"];
+  if (!token) {
+    return res.status(401).json({
+      message: "Token Not Found",
+    });
+  } else {
+    jwt.verify(token, "dev_token", function (err, decoded) {
+      if (err) {
+        return res.status(401).json({
+          message: "Token Invalid",
+        });
+      } else {
+        return res.status(200).json({
+          status: 200,
+          data: decoded.data,
+        });
+      }
+    });
+  }
+}
+
+module.exports = { signUp, signIn, getDataJWT };

@@ -1,7 +1,6 @@
 const { connection } = require("../config/database.js");
 
 function signIn(body, callback) {
-  console.log(body);
   connection.query(
     `SELECT * FROM users WHERE username = '${body}'`,
     function (err, result) {
@@ -15,9 +14,9 @@ function signIn(body, callback) {
   );
 }
 
-function signUp(body, callback) {
+function signUp(nama, username, password, userAgent, callback) {
   connection.query(
-    `INSERT INTO users(nama,username,password,user_agent) VALUES ('${body.nama}','${body.username}', '${body.password}','${body.userAgent}')`,
+    `INSERT INTO users(nama,username,password,user_agent) VALUES ('${nama}','${username}', '${password}','${userAgent}')`,
     function (err, result) {
       if (err) {
         console.log(err);
