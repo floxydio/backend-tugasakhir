@@ -2,7 +2,6 @@ const absenRepo = require("../repository/absen.repo.js");
 const { AbsenEntity } = require("../models/absen.model.js");
 
 function sendAbsence(req, res) {
-  console.log("Absen Controller Launched 😎");
   const { user_id, guru_id, pelajaran_id, kelas_id, keterangan, createdAt } =
     req.body;
 

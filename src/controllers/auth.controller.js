@@ -22,6 +22,7 @@ function signIn(req, res) {
                 id: result[0].id,
                 nama: result[0].nama,
                 role: result[0].status_role,
+                kelas_id: result[0].kelas_id,
               },
             },
             "dev_token"
@@ -47,14 +48,10 @@ function signIn(req, res) {
 }
 
 function signUp(req, res) {
-  console.log("Auth Controller Launched 😎");
-
   const saltRounds = 10;
   const { nama, username, password, userAgent } = req.body;
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(password, salt);
-
-  // const userModel = new UserEntity(nama, username, hash, "Agent/Develop");
 
   auth.signUp(nama, username, hash, userAgent, function (err, result) {
     if (err) {
@@ -70,7 +67,6 @@ function signUp(req, res) {
 }
 
 function getDataJWT(req, res) {
-  console.log("Auth Controller Launched 😎");
   const token = req.headers["x-access-token"];
   if (!token) {
     return res.status(401).json({
