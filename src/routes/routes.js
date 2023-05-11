@@ -12,7 +12,7 @@ const { getFindData } = require("../controllers/pelajaran.controller.js");
 
 function Routes(app) {
   app.get("/", function (req, res) {
-    res.send("Test");
+    res.send("Api Running  🚀\n\n\nAsk Dio if have question");
   });
 
   app.post("/v1/sign-up", signUp);
