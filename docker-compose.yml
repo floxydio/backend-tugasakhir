@@ -3,8 +3,8 @@ version: "3"
 services:
   # Database
   db:
-    platform: linux/x86_64
     image: mysql:5.7
+    command: --innodb-buffer-pool-size=50M --innodb-log-buffer-size=8M --innodb-flush-log-at-trx-commit=2 --innodb-file-per-table=1 --max-connections=25
     volumes:
       - db_data:/var/lib/mysql
     restart: always
@@ -13,6 +13,11 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_PASSWORD: reco123!..
+      MYSQL_MAX_CONNECTIONS: 25
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     networks:
       - mysql-phpmyadmin
 
@@ -28,7 +33,6 @@ services:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: root
       UPLOAD_LIMIT: 1000000000
-
     networks:
       - mysql-phpmyadmin
 
