@@ -2,7 +2,7 @@ const { connection } = require("../config/database.js");
 
 function findAllByQuery(jadwalId, kelasId, callback) {
   connection.query(
-    `SELECT pelajaran.nama,guru.nama as guru, kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id WHERE pelajaran.jadwal = ${jadwalId} AND pelajaran.kelas_id = ${kelasId}`,
+    `SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id WHERE pelajaran.jadwal = ${jadwalId} AND pelajaran.kelas_id = ${kelasId}`,
     function (err, result) {
       if (err) {
         callback(err, null);
