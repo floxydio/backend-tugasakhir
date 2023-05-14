@@ -7,6 +7,7 @@ function getFindData(req, res) {
     function (err, result) {
       if (err) {
         return res.status(400).json({
+          err: err,
           message: "Something Went Wrong",
         });
       } else {

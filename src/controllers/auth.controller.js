@@ -9,6 +9,7 @@ function signIn(req, res) {
     if (err) {
       return res.status(400).json({
         message: "Something Went Wrong",
+        err: err,
       });
     } else {
       if (result.length > 0) {
