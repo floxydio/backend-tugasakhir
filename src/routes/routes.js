@@ -7,7 +7,10 @@ const {
   signIn,
   getDataJWT,
 } = require("../controllers/auth.controller.js");
-const { sendAbsence } = require("../controllers/absen.controller.js");
+const {
+  sendAbsence,
+  getAbsenByUserId,
+} = require("../controllers/absen.controller.js");
 const { getFindData } = require("../controllers/pelajaran.controller.js");
 
 function Routes(app) {
@@ -23,6 +26,7 @@ function Routes(app) {
   app.post("/v1/guru", createGuru);
 
   app.post("/v1/absen", sendAbsence);
+  app.get("/v1/absen/:id", getAbsenByUserId);
 
   app.get("/v1/pelajaran/:id/:kelas", getFindData);
   // Endpoint

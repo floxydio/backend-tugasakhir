@@ -14,4 +14,18 @@ function sendAbsence(body, callback) {
   );
 }
 
-module.exports = { sendAbsence };
+function getAbsenByUserId(id, callback) {
+  connection.query(
+    `SELECT SUM(absen.keterangan = 'ABSEN') as total_absen, SUM(absen.keterangan = 'IZIN') as total_izin, SUM(absen.keterangan = 'ALPHA') as total_alpha FROM absen WHERE user_id = ${id}`,
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    }
+  );
+}
+
+module.exports = { sendAbsence, getAbsenByUserId };

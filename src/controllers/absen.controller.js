@@ -36,4 +36,22 @@ function sendAbsence(req, res) {
   });
 }
 
-module.exports = { sendAbsence };
+function getAbsenByUserId(req, res) {
+  const { id } = req.params;
+  absenRepo.getAbsenByUserId(id, function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something Went Wrong",
+      });
+    } else {
+      return res.status(200).json({
+        status: 200,
+        message: "Berhasil Get Data",
+        data: result,
+      });
+    }
+  });
+}
+
+module.exports = { sendAbsence, getAbsenByUserId };
