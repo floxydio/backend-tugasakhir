@@ -13,4 +13,17 @@ function findAllByQuery(jadwalId, kelasId, callback) {
   );
 }
 
-module.exports = { findAllByQuery };
+function insertPelajaran(nama, guruId, kelasId, jadwalId, createdAt, callback) {
+  connection.query(
+    `INSERT INTO pelajaran (nama,guru_id,kelas_id,jadwal,createdAt) VALUES ('${nama}','${guruId}','${kelasId}','${jadwalId}','${createdAt}')`,
+    function (err, result) {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    }
+  );
+}
+
+module.exports = { findAllByQuery, insertPelajaran };

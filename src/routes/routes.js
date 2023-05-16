@@ -11,7 +11,10 @@ const {
   sendAbsence,
   getAbsenByUserId,
 } = require("../controllers/absen.controller.js");
-const { getFindData } = require("../controllers/pelajaran.controller.js");
+const {
+  getFindData,
+  insertPelajaran,
+} = require("../controllers/pelajaran.controller.js");
 
 function Routes(app) {
   app.get("/", function (req, res) {
@@ -29,6 +32,7 @@ function Routes(app) {
   app.get("/v1/absen/:id", getAbsenByUserId);
 
   app.get("/v1/pelajaran/:id/:kelas", getFindData);
+  app.post("/v1/create-pelajaran", insertPelajaran);
   // Endpoint
 }
 

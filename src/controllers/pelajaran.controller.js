@@ -28,4 +28,28 @@ function getFindData(req, res) {
   );
 }
 
-module.exports = { getFindData };
+function insertPelajaran(req, res) {
+  const { nama, guruId, kelasId, jadwalId, createdAt } = req.body;
+
+  pelajaranRepo.insertPelajaran(
+    nama,
+    guruId,
+    kelasId,
+    jadwalId,
+    createdAt,
+    function (err, result) {
+      if (err) {
+        return res.status(400).json({
+          err: err,
+          message: "Something went wrong",
+        });
+      } else {
+        return res.status(201).json({
+          message: "Successfully Create Pelajaran",
+        });
+      }
+    }
+  );
+}
+
+module.exports = { getFindData,insertPelajaran };
