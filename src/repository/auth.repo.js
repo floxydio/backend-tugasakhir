@@ -7,8 +7,10 @@ function signIn(body, callback) {
       if (err) {
         console.log(err);
         callback(err, null);
+        connection.destroy();
       } else {
         callback(null, result);
+        connection.destroy();
       }
     }
   );
@@ -21,8 +23,10 @@ function signUp(nama, username, password, userAgent, callback) {
       if (err) {
         console.log(err);
         callback(err, null);
+        connection.destroy();
       } else {
         callback(null, result);
+        connection.destroy();
       }
     }
   );

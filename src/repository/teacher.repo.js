@@ -5,9 +5,11 @@ function findAll(callback) {
     if (err) {
       console.log("Something went wrong");
       callback(err, null);
+      connection.destroy();
     }
     //  console.log(result);
     callback(null, result);
+    connection.destroy();
   });
 }
 
@@ -17,8 +19,10 @@ function save(body, callback) {
     function (err, result) {
       if (err) {
         callback(err, null);
+        connection.destroy();
       } else {
         callback(null, result);
+        connection.destroy();
       }
     }
   );
