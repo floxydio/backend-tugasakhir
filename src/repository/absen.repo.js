@@ -7,10 +7,10 @@ function sendAbsence(body, callback) {
       if (err) {
         console.log(err);
         callback(err, null);
-        connection.destroy();
+        connection.end();
       } else {
         callback(null, result);
-        connection.destroy();
+        connection.end();
       }
     }
   );
@@ -23,10 +23,10 @@ function getAbsenByUserId(id, callback) {
       if (err) {
         console.log(err);
         callback(err, null);
-        connection.destroy();
+        connection.end();
       } else {
         callback(null, result);
-        connection.destroy();
+        connection.end();
       }
     }
   );

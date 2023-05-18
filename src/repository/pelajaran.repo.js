@@ -6,10 +6,10 @@ function findAllByQuery(jadwalId, kelasId, callback) {
     function (err, result) {
       if (err) {
         callback(err, null);
-        connection.destroy();
+        connection.end();
       } else {
         callback(null, result);
-        connection.destroy();
+        connection.end();
       }
     }
   );
@@ -21,10 +21,10 @@ function insertPelajaran(nama, guruId, kelasId, jadwalId, createdAt, callback) {
     function (err, result) {
       if (err) {
         callback(err, null);
-        connection.destroy();
+        connection.end();
       } else {
         callback(null, result);
-        connection.destroy();
+        connection.end();
       }
     }
   );
