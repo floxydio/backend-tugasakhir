@@ -35,14 +35,13 @@ function Routes(app) {
   // Absen --
   app.post("/v1/absen", sendAbsence);
   app.get("/v1/absen/:id", getAbsenByUserId);
-  app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
+  // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
   // End Of Absen --
 
   // Pelajaran -
   app.get("/v1/pelajaran/:id/:kelas", getFindData);
   app.post("/v1/create-pelajaran", insertPelajaran);
- // End Of Pelajaran
-
+  // End Of Pelajaran
 }
 
 module.exports = { Routes };
