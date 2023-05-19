@@ -1,14 +1,38 @@
 const { connection } = require("../config/database.js");
 
-function findAll(callback) {
-  connection.query("SELECT * FROM guru", function (err, result) {
-    if (err) {
-      console.log("Something went wrong");
-      callback(err, null);
-    }
-    //  console.log(result);
-    callback(null, result);
-  });
+function findAll(rating, orderby, callback) {
+  if (rating === undefined && orderby === undefined) {
+    connection.query("SELECT * FROM guru", function (err, result) {
+      if (err) {
+        console.log("Something went wrong");
+        callback(err, null);
+      }
+      //  console.log(result);
+      callback(null, result);
+    });
+  } else if (rating === undefined && orderby !== undefined) {
+    connection.query(
+      `SELECT * FROM guru ORDER BY guru.id ${orderby}`,
+      function (err, result) {
+        if (err) {
+          callback(err, null);
+        }
+        //  console.log(result);
+        callback(null, result);
+      }
+    );
+  } else if (rating !== undefined && orderby !== undefined) {
+    connection.query(
+      `SELECT * FROM guru WHERE guru.rating = '${rating}' ORDER BY guru.id ${orderby}`,
+      function (err, result) {
+        if (err) {
+          callback(err, null);
+        }
+        //  console.log(result);
+        callback(null, result);
+      }
+    );
+  }
 }
 
 function save(body, callback) {
