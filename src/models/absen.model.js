@@ -6,7 +6,10 @@ class AbsenEntity {
     kelas_id,
     keterangan,
     reason,
-    createdAt
+    day,
+    month,
+    year,
+    time
   ) {
     this.user_id = user_id;
     this.guru_id = guru_id;
@@ -14,7 +17,10 @@ class AbsenEntity {
     this.kelas_id = kelas_id;
     this.keterangan = keterangan;
     this.reason = reason;
-    this.createdAt = createdAt;
+    this.day = day;
+    this.month = month;
+    this.year = year;
+    this.time = time;
   }
 }
 

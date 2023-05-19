@@ -10,6 +10,7 @@ const {
 const {
   sendAbsence,
   getAbsenByUserId,
+  getAbsen,
 } = require("../controllers/absen.controller.js");
 const {
   getFindData,
@@ -35,6 +36,7 @@ function Routes(app) {
   // Absen --
   app.post("/v1/absen", sendAbsence);
   app.get("/v1/absen/:id", getAbsenByUserId);
+  app.get("/v1/absen", getAbsen);
   // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
   // End Of Absen --
 

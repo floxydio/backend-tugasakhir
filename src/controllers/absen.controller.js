@@ -9,7 +9,10 @@ function sendAbsence(req, res) {
     kelas_id,
     keterangan,
     reason,
-    createdAt,
+    day,
+    month,
+    year,
+    time,
   } = req.body;
 
   const data = new AbsenEntity(
@@ -19,7 +22,10 @@ function sendAbsence(req, res) {
     kelas_id,
     keterangan,
     reason,
-    createdAt
+    day,
+    month,
+    year,
+    time
   );
   absenRepo.sendAbsence(data, function (err, result) {
     if (err) {
@@ -54,4 +60,21 @@ function getAbsenByUserId(req, res) {
   });
 }
 
-module.exports = { sendAbsence, getAbsenByUserId };
+function getAbsen() {
+  absenRepo.getAbsen(function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(200).json({
+        status: 200,
+        message: "Berhasil Get Data",
+        data: result,
+      });
+    }
+  });
+}
+
+module.exports = { sendAbsence, getAbsenByUserId, getAbsen };
