@@ -16,7 +16,7 @@ function signIn(body, callback) {
 
 function updateUserAgent(body, username, callback) {
   connection.query(
-    `UPDATE user SET user_agent = '${body}' WHERE username ='${username}'`,
+    `UPDATE users SET user_agent = '${body}' WHERE username ='${username}'`,
     function (err, result) {
       if (err) {
         console.log(err);
