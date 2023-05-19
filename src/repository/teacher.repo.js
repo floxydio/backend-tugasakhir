@@ -13,7 +13,7 @@ function findAll(callback) {
 
 function save(body, callback) {
   connection.query(
-    `INSERT INTO guru(nama,mengajar,status_guru,rating) VALUES ('${body.nama}', '${body.mengajar}', '${body.status_guru}', '${body.status}')`,
+    `INSERT INTO guru(nama,mengajar,status_guru,rating) VALUES ('${body.nama}', '${body.mengajar}', '${body.status_guru}', '${body.rating}')`,
     function (err, result) {
       if (err) {
         callback(err, null);
