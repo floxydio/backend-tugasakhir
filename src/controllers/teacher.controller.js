@@ -18,10 +18,10 @@ function findAllGuru(req, res) {
 }
 
 function createGuru(req, res) {
-  const { nama, umur, mengajar, status_guru, rating } = req.body;
+  const { nama, mengajar, status_guru, rating } = req.body;
 
-  const guru = new TeacherEntity(nama, umur, mengajar, status_guru, rating);
-  guruRepo.create(guru, function (err, result) {
+  const guru = new TeacherEntity(nama, mengajar, status_guru, rating);
+  guruRepo.save(guru, function (err, result) {
     if (err) {
       return res.status(400).json({
         message: "Something went wrong",
