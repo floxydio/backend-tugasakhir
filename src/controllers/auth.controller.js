@@ -28,7 +28,7 @@ function signIn(req, res) {
             },
             "dev_token"
           );
-          let userAgent = navigator.userAgent;
+          let userAgent = window.navigator.userAgent;
           auth.updateUserAgent(userAgent, result[0].username);
           return res.status(200).json({
             status: 200,
