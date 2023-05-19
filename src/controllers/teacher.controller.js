@@ -24,6 +24,7 @@ function createGuru(req, res) {
   guruRepo.save(guru, function (err, result) {
     if (err) {
       return res.status(400).json({
+        err: err,
         message: "Something went wrong",
       });
     } else {
