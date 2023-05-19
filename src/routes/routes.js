@@ -15,6 +15,7 @@ const {
 const {
   getFindData,
   insertPelajaran,
+  findAllData,
 } = require("../controllers/pelajaran.controller.js");
 
 function Routes(app) {
@@ -41,6 +42,7 @@ function Routes(app) {
   // End Of Absen --
 
   // Pelajaran -
+  app.get("/v1/pelajaran", findAllData);
   app.get("/v1/pelajaran/:id/:kelas", getFindData);
   app.post("/v1/create-pelajaran", insertPelajaran);
   // End Of Pelajaran
