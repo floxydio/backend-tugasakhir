@@ -60,7 +60,7 @@ function getAbsenByUserId(req, res) {
   });
 }
 
-function getAbsen() {
+function getAbsen(req, res) {
   absenRepo.getAbsen(function (err, result) {
     if (err) {
       return res.status(400).json({
