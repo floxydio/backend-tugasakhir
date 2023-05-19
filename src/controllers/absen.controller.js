@@ -61,7 +61,9 @@ function getAbsenByUserId(req, res) {
 }
 
 function getAbsen(req, res) {
-  absenRepo.getAbsen(function (err, result) {
+  const { orderby, gurunama, month } = req.query;
+
+  absenRepo.getAbsen(orderby,gurunama,month,function (err, result) {
     if (err) {
       return res.status(400).json({
         err: err,
