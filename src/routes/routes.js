@@ -1,6 +1,7 @@
 const {
   findAllGuru,
   createGuru,
+  editGuru,
 } = require("../controllers/teacher.controller.js");
 const {
   signUp,
@@ -32,6 +33,7 @@ function Routes(app) {
   // Guru --
   app.get("/v1/guru", findAllGuru);
   app.post("/v1/guru", createGuru);
+  app.put("/v1/edit-guru/:id", editGuru);
   // End Of Guru
 
   // Absen --

@@ -37,4 +37,23 @@ function createGuru(req, res) {
   });
 }
 
-module.exports = { findAllGuru, createGuru };
+function editGuru(req, res) {
+  const id = req.params.id;
+  const { nama, mengajar, status_guru, rating } = req.body;
+
+  const guru = new TeacherEntity(nama, mengajar, status_guru, rating);
+  guruRepo.editGuruQuery(id, guru, function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Successfully Edit Guru",
+      });
+    }
+  });
+}
+
+module.exports = { findAllGuru, createGuru, editGuru };

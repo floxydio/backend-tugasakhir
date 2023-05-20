@@ -48,4 +48,17 @@ function save(body, callback) {
   );
 }
 
-module.exports = { findAll, save };
+function editGuruQuery(id, body, callback) {
+  connection.query(
+    `UPDATE guru SET nama = '${body.nama}', mengajar = '${body.mengajar}', status_guru = '${body.status_guru}', rating = '${body.rating}' WHERE id = '${id}'`,
+    function (err, result) {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    }
+  );
+}
+
+module.exports = { findAll, save, editGuruQuery };
