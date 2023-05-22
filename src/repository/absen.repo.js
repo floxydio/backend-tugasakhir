@@ -16,7 +16,7 @@ function sendAbsence(body, callback) {
 
 function updateAbsen(id, body, callback) {
   connection.query(
-    `UPDATE absen SET guru_id = '${body.guru_id}', pelajaran_id = '${body.pelajaran_id}', kelas_id = '${body.kelas_id}', keterangan = '${body.keterangan}', reason = '${body.reason}', day = '${body.day}', month = '${body.month}', year ='${body.year}', time = '${body.time}' WHERE id = '${id}'`,
+    `UPDATE absen SET guru_id = '${body.guru_id}', pelajaran_id = '${body.pelajaran_id}', kelas_id = '${body.kelas_id}', keterangan = '${body.keterangan}', reason = '${body.reason}', day = '${body.day}', month = '${body.month}', year ='${body.year}', time = '${body.time}' WHERE id = ${id}`,
     function (err, result) {
       if (err) {
         console.log(err);
