@@ -12,12 +12,14 @@ const {
   sendAbsence,
   getAbsenByUserId,
   getAbsen,
+  updateAbsen,
 } = require("../controllers/absen.controller.js");
 const {
   getFindData,
   insertPelajaran,
   findAllData,
 } = require("../controllers/pelajaran.controller.js");
+const { findKelas } = require("../controllers/kelas.controller.js");
 
 function Routes(app) {
   app.get("/", function (req, res) {
@@ -40,6 +42,7 @@ function Routes(app) {
   app.post("/v1/absen", sendAbsence);
   app.get("/v1/absen/:id", getAbsenByUserId);
   app.get("/v1/absen", getAbsen);
+  app.put("/v1/edit-absen/:id", updateAbsen);
   // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
   // End Of Absen --
 
@@ -48,6 +51,11 @@ function Routes(app) {
   app.get("/v1/pelajaran/:id/:kelas", getFindData);
   app.post("/v1/create-pelajaran", insertPelajaran);
   // End Of Pelajaran
+
+  // Kelas
+  app.get("/v1/kelas", findKelas)
+
+  //End Of Kelas
 }
 
 module.exports = { Routes };

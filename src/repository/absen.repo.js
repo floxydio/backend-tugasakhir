@@ -14,6 +14,20 @@ function sendAbsence(body, callback) {
   );
 }
 
+function updateAbsen(id, body, callback) {
+  connection.query(
+    `UPDATE absen SET guru_id = '${body.guru_id}', pelajaran_id = '${body.pelajaran_id}', kelas_id = '${body.kelas_id}', keterangan = '${body.keterangan}', reason = '${body.reason}', day = '${body.day}', month = '${body.month}, year ='${body.year}', time = '${body.time}' WHERE id = '${id}'`,
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    }
+  );
+}
+
 function getAbsenByUserId(id, callback) {
   connection.query(
     `SELECT SUM(absen.keterangan = 'ABSEN') as total_absen, SUM(absen.keterangan = 'IZIN') as total_izin, SUM(absen.keterangan = 'ALPHA') as total_alpha FROM absen WHERE user_id = ${id}`,
@@ -76,4 +90,4 @@ function getAbsen(orderby, gurunama, month, callback) {
   }
 }
 
-module.exports = { sendAbsence, getAbsenByUserId, getAbsen };
+module.exports = { sendAbsence, getAbsenByUserId, getAbsen, updateAbsen };

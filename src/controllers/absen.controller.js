@@ -63,7 +63,7 @@ function getAbsenByUserId(req, res) {
 function getAbsen(req, res) {
   const { orderby, gurunama, month } = req.query;
 
-  absenRepo.getAbsen(orderby,gurunama,month,function (err, result) {
+  absenRepo.getAbsen(orderby, gurunama, month, function (err, result) {
     if (err) {
       return res.status(400).json({
         err: err,
@@ -79,4 +79,49 @@ function getAbsen(req, res) {
   });
 }
 
-module.exports = { sendAbsence, getAbsenByUserId, getAbsen };
+function updateAbsen(req, res) {
+  const id = req.params.id;
+
+  const {
+    user_id,
+    guru_id,
+    pelajaran_id,
+    kelas_id,
+    keterangan,
+    reason,
+    day,
+    month,
+    year,
+    time,
+  } = req.body;
+
+  const data = new AbsenEntity(
+    user_id,
+    guru_id,
+    pelajaran_id,
+    kelas_id,
+    keterangan,
+    reason,
+    day,
+    month,
+    year,
+    time
+  );
+
+  absenRepo.updateAbsen(id, data, function (err, res) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(200).json({
+        status: 200,
+        message: "Berhasil Update Data",
+        data: result,
+      });
+    }
+  });
+}
+
+module.exports = { sendAbsence, getAbsenByUserId, getAbsen, updateAbsen };
