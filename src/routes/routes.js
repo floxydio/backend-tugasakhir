@@ -18,6 +18,7 @@ const {
   getFindData,
   insertPelajaran,
   findAllData,
+  getAllPelajaran,
 } = require("../controllers/pelajaran.controller.js");
 const { findKelas } = require("../controllers/kelas.controller.js");
 
@@ -48,13 +49,13 @@ function Routes(app) {
 
   // Pelajaran -
   app.get("/v1/pelajaran", findAllData);
+  app.get("/v1/find-pelajaran", getAllPelajaran);
   app.get("/v1/pelajaran/:id/:kelas", getFindData);
   app.post("/v1/create-pelajaran", insertPelajaran);
   // End Of Pelajaran
 
   // Kelas
-  app.get("/v1/kelas", findKelas)
-
+  app.get("/v1/kelas", findKelas);
   //End Of Kelas
 }
 

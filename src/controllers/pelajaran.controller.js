@@ -52,6 +52,23 @@ function getFindData(req, res) {
   );
 }
 
+function getAllPelajaran(req, res) {
+  pelajaranRepo.find(function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(201).json({
+        status: 200,
+        data: result,
+        message: "Successfully Get Data",
+      });
+    }
+  });
+}
+
 function insertPelajaran(req, res) {
   const { nama, guruId, kelasId, jadwalId, createdAt } = req.body;
 
@@ -76,4 +93,4 @@ function insertPelajaran(req, res) {
   );
 }
 
-module.exports = { getFindData, insertPelajaran, findAllData };
+module.exports = { getFindData, insertPelajaran, findAllData, getAllPelajaran };
