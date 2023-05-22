@@ -108,7 +108,7 @@ function updateAbsen(req, res) {
     time
   );
 
-  absenRepo.updateAbsen(id, data, function (err, res) {
+  absenRepo.updateAbsen(id, data, function (err, result) {
     if (err) {
       return res.status(400).json({
         err: err,
