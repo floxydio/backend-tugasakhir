@@ -2,8 +2,8 @@ const guruRepo = require("../repository/teacher.repo.js");
 const { TeacherEntity } = require("../models/teacher.model.js");
 
 function findAllGuru(req, res) {
-  const { rating, orderby } = req.query;
-  guruRepo.findAll(rating, orderby, function (err, result) {
+  const { search,rating, orderby } = req.query;
+  guruRepo.findAll(search,rating, orderby, function (err, result) {
     if (err) {
       return res.status(400).json({
         err: err,

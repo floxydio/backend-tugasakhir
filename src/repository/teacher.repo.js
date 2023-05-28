@@ -1,7 +1,7 @@
 const { connection } = require("../config/database.js");
 
-function findAll(rating, orderby, callback) {
-  if (rating === undefined && orderby === undefined) {
+function findAll(search, rating, orderby, callback) {
+  if (rating === undefined && orderby === undefined && search === undefined) {
     connection.query("SELECT * FROM guru", function (err, result) {
       if (err) {
         console.log("Something went wrong");
@@ -10,7 +10,11 @@ function findAll(rating, orderby, callback) {
       //  console.log(result);
       callback(null, result);
     });
-  } else if (rating === undefined && orderby !== undefined) {
+  } else if (
+    rating === undefined &&
+    orderby !== undefined &&
+    search === undefined
+  ) {
     connection.query(
       `SELECT * FROM guru ORDER BY guru.id ${orderby}`,
       function (err, result) {
@@ -21,9 +25,57 @@ function findAll(rating, orderby, callback) {
         callback(null, result);
       }
     );
-  } else if (rating !== undefined && orderby !== undefined) {
+  } else if (
+    rating !== undefined &&
+    orderby !== undefined &&
+    search === undefined
+  ) {
     connection.query(
       `SELECT * FROM guru WHERE guru.rating = '${rating}' ORDER BY guru.id ${orderby}`,
+      function (err, result) {
+        if (err) {
+          callback(err, null);
+        }
+        //  console.log(result);
+        callback(null, result);
+      }
+    );
+  } else if (
+    rating === undefined &&
+    orderby === undefined &&
+    search !== undefined
+  ) {
+    connection.query(
+      `SELECT * FROM guru WHERE nama = '${search}'`,
+      function (err, result) {
+        if (err) {
+          callback(err, null);
+        }
+        callback(null, result);
+      }
+    );
+  } else if (
+    rating === undefined &&
+    orderby !== undefined &&
+    search !== undefined
+  ) {
+    connection.query(
+      `SELECT * FROM guru WHERE nama = '${search}' ORDER BY guru.id ${orderby}`,
+      function (err, result) {
+        if (err) {
+          callback(err, null);
+        }
+        //  console.log(result);
+        callback(null, result);
+      }
+    );
+  } else if (
+    rating !== undefined &&
+    orderby !== undefined &&
+    search !== undefined
+  ) {
+    connection.query(
+      `SELECT * FROM guru WHERE nama = '${search}' AND guru.rating = '${rating}' ORDER BY guru.id ${orderby}`,
       function (err, result) {
         if (err) {
           callback(err, null);
