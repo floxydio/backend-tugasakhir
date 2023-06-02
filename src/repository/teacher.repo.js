@@ -46,7 +46,7 @@ function findAll(search, rating, orderby, callback) {
     search !== undefined
   ) {
     connection.query(
-      `SELECT * FROM guru WHERE nama = '${search}'`,
+      `SELECT * FROM guru WHERE nama LIKE '%${search}%`,
       function (err, result) {
         if (err) {
           callback(err, null);
@@ -60,7 +60,7 @@ function findAll(search, rating, orderby, callback) {
     search !== undefined
   ) {
     connection.query(
-      `SELECT * FROM guru WHERE nama = '${search}' ORDER BY guru.id ${orderby}`,
+      `SELECT * FROM guru WHERE nama LIKE '%${search}%' ORDER BY guru.id ${orderby}`,
       function (err, result) {
         if (err) {
           callback(err, null);
@@ -75,7 +75,7 @@ function findAll(search, rating, orderby, callback) {
     search !== undefined
   ) {
     connection.query(
-      `SELECT * FROM guru WHERE nama = '${search}' AND guru.rating = '${rating}' ORDER BY guru.id ${orderby}`,
+      `SELECT * FROM guru WHERE nama LIKE '%${search}%' AND guru.rating = '${rating}' ORDER BY guru.id ${orderby}`,
       function (err, result) {
         if (err) {
           callback(err, null);
