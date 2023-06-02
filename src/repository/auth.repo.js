@@ -4,6 +4,7 @@ function signIn(body, callback) {
   connection.query(
     `SELECT * FROM users WHERE username = '${body}'`,
     function (err, result) {
+      connection.end();
       if (err) {
         console.log(err);
         callback(err, null);
