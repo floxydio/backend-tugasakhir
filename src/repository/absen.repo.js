@@ -28,9 +28,9 @@ function updateAbsen(id, body, callback) {
   );
 }
 
-function getAbsenByUserId(id, callback) {
+function getAbsenByUserId(id, month, callback) {
   connection.query(
-    `SELECT SUM(absen.keterangan = 'ABSEN') as total_absen, SUM(absen.keterangan = 'IZIN') as total_izin, SUM(absen.keterangan = 'ALPHA') as total_alpha FROM absen WHERE user_id = ${id}`,
+    `SELECT SUM(absen.keterangan = 'ABSEN') as total_absen, SUM(absen.keterangan = 'IZIN') as total_izin, SUM(absen.keterangan = 'ALPHA') as total_alpha FROM absen WHERE user_id = ${id} AND month = ${month}`,
     function (err, result) {
       if (err) {
         console.log(err);

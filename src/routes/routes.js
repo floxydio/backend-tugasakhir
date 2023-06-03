@@ -43,7 +43,7 @@ function Routes(app) {
 
   // Absen --
   app.post("/v1/absen", sendAbsence);
-  app.get("/v1/absen/:id", getAbsenByUserId);
+  app.get("/v1/absen/:id/:month", getAbsenByUserId);
   app.get("/v1/absen", getAbsen);
   app.put("/v1/edit-absen/:id", updateAbsen);
   // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);

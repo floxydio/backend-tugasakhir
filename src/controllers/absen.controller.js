@@ -43,8 +43,8 @@ function sendAbsence(req, res) {
 }
 
 function getAbsenByUserId(req, res) {
-  const { id } = req.params;
-  absenRepo.getAbsenByUserId(id, function (err, result) {
+  const { id, month } = req.params;
+  absenRepo.getAbsenByUserId(id, month, function (err, result) {
     if (err) {
       return res.status(400).json({
         err: err,

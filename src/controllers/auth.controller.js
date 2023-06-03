@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 function signIn(req, res) {
-  console.log("Auth Controller Launched 😎");
   const { username, password } = req.body;
   auth.signIn(username, function (err, result) {
     if (err) {
