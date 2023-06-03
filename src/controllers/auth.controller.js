@@ -31,9 +31,7 @@ function signIn(req, res) {
           auth.updateUserAgent(
             req.headers["user-agent"],
             result[0].username,
-            function (err, result) {
-              console.log(err);
-            }
+            function (err, result) {}
           );
           return res.status(200).json({
             status: 200,

@@ -5,7 +5,6 @@ function signIn(body, callback) {
     `SELECT * FROM users WHERE username = '${body}'`,
     function (err, result) {
       if (err) {
-        console.log(err);
         callback(err, null);
       } else {
         callback(null, result);
@@ -32,7 +31,6 @@ function updateUserAgent(body, username, callback) {
     `UPDATE users SET user_agent = '${body}' WHERE username ='${username}'`,
     function (err, result) {
       if (err) {
-        console.log(err);
         callback(err, null);
       } else {
         callback(null, result);
@@ -46,7 +44,6 @@ function editProfile(id, nama, password, notelp, callback) {
     `UPDATE users SET nama = '${nama}', password = '${password}', notelp = '${notelp}' WHERE id = '${id}'`,
     function (err, result) {
       if (err) {
-        console.log(err);
         callback(err, null);
       } else {
         callback(null, result);
@@ -60,7 +57,6 @@ function signUp(nama, username, password, userAgent, callback) {
     `INSERT INTO users(nama,username,password,user_agent) VALUES ('${nama}','${username}', '${password}','${userAgent}')`,
     function (err, result) {
       if (err) {
-        console.log(err);
         callback(err, null);
       } else {
         callback(null, result);
