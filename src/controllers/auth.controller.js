@@ -54,6 +54,26 @@ function signIn(req, res) {
   });
 }
 
+function editProfile(req, res) {
+  const saltRounds = 10;
+  const { nama, password, notelp } = req.body;
+  const { id } = req.params;
+  const salt = bcrypt.genSaltSync(saltRounds);
+  const hash = bcrypt.hashSync(password, salt);
+
+  auth.editProfile(id, nama, hash, notelp, function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(201).json({
+        message: "Successfully Update User",
+      });
+    }
+  });
+}
+
 function signUp(req, res) {
   const saltRounds = 10;
   const { nama, username, password, userAgent } = req.body;
@@ -111,4 +131,4 @@ function getDataJWT(req, res) {
   }
 }
 
-module.exports = { signUp, signIn, getDataJWT, getDataUser };
+module.exports = { signUp, signIn, getDataJWT, getDataUser, editProfile };

@@ -8,6 +8,7 @@ const {
   signIn,
   getDataJWT,
   getDataUser,
+  editProfile,
 } = require("../controllers/auth.controller.js");
 const {
   sendAbsence,
@@ -22,6 +23,7 @@ const {
   getAllPelajaran,
 } = require("../controllers/pelajaran.controller.js");
 const { findKelas } = require("../controllers/kelas.controller.js");
+const authMiddleware = require("../middleware/auth.js");
 
 function Routes(app) {
   app.get("/", function (req, res) {
@@ -32,28 +34,29 @@ function Routes(app) {
   app.post("/v1/sign-up", signUp);
   app.post("/v1/sign-in", signIn);
   app.get("/v1/refresh-token", getDataJWT);
-  app.get("/v1/list-users", getDataUser);
+  app.get("/v1/list-users", authMiddleware, getDataUser);
+  app.put("/v1/edit-profile/:id", authMiddleware, editProfile);
   // End Of Auth
 
   // Guru --
   app.get("/v1/guru", findAllGuru);
-  app.post("/v1/guru", createGuru);
-  app.put("/v1/edit-guru/:id", editGuru);
+  app.post("/v1/guru", authMiddleware, createGuru);
+  app.put("/v1/edit-guru/:id", authMiddleware, editGuru);
   // End Of Guru
 
   // Absen --
-  app.post("/v1/absen", sendAbsence);
-  app.get("/v1/absen/:id/:month", getAbsenByUserId);
-  app.get("/v1/absen", getAbsen);
-  app.put("/v1/edit-absen/:id", updateAbsen);
+  app.post("/v1/absen", authMiddleware, sendAbsence);
+  app.get("/v1/absen/:id/:month", authMiddleware, getAbsenByUserId);
+  app.get("/v1/absen", authMiddleware, getAbsen);
+  app.put("/v1/edit-absen/:id", authMiddleware, updateAbsen);
   // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
   // End Of Absen --
 
   // Pelajaran -
   app.get("/v1/pelajaran", findAllData);
   app.get("/v1/find-pelajaran", getAllPelajaran);
-  app.get("/v1/pelajaran/:id/:kelas", getFindData);
-  app.post("/v1/create-pelajaran", insertPelajaran);
+  app.get("/v1/pelajaran/:id/:kelas", authMiddleware, getFindData);
+  app.post("/v1/create-pelajaran", authMiddleware, insertPelajaran);
   // End Of Pelajaran
 
   // Kelas

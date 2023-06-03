@@ -41,6 +41,20 @@ function updateUserAgent(body, username, callback) {
   );
 }
 
+function editProfile(id, nama, password, notelp, callback) {
+  connection.query(
+    `UPDATE users SET nama = '${nama}', password = '${password}', notelp = '${notelp}' WHERE id = '${id}'`,
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    }
+  );
+}
+
 function signUp(nama, username, password, userAgent, callback) {
   connection.query(
     `INSERT INTO users(nama,username,password,user_agent) VALUES ('${nama}','${username}', '${password}','${userAgent}')`,
@@ -54,4 +68,4 @@ function signUp(nama, username, password, userAgent, callback) {
     }
   );
 }
-module.exports = { signUp, signIn, updateUserAgent, getUser };
+module.exports = { signUp, signIn, updateUserAgent, getUser, editProfile };
