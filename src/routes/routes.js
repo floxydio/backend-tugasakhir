@@ -7,6 +7,7 @@ const {
   signUp,
   signIn,
   getDataJWT,
+  getDataUser,
 } = require("../controllers/auth.controller.js");
 const {
   sendAbsence,
@@ -31,6 +32,7 @@ function Routes(app) {
   app.post("/v1/sign-up", signUp);
   app.post("/v1/sign-in", signIn);
   app.get("/v1/refresh-token", getDataJWT);
+  app.get("/v1/list-users", getDataUser);
   // End Of Auth
 
   // Guru --

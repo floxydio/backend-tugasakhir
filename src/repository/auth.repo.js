@@ -4,9 +4,21 @@ function signIn(body, callback) {
   connection.query(
     `SELECT * FROM users WHERE username = '${body}'`,
     function (err, result) {
-      connection.end();
       if (err) {
         console.log(err);
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    }
+  );
+}
+
+function getUser(callback) {
+  connection.query(
+    `SELECT users.id,users.nama FROM users WHERE users.status_user = 3`,
+    function (err, result) {
+      if (err) {
         callback(err, null);
       } else {
         callback(null, result);
@@ -42,4 +54,4 @@ function signUp(nama, username, password, userAgent, callback) {
     }
   );
 }
-module.exports = { signUp, signIn, updateUserAgent };
+module.exports = { signUp, signIn, updateUserAgent, getUser };

@@ -74,6 +74,22 @@ function signUp(req, res) {
   });
 }
 
+function getDataUser(req, res) {
+  auth.getUser(function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(200).json({
+        data: result,
+        message: "Successfully GET User",
+      });
+    }
+  });
+}
+
 function getDataJWT(req, res) {
   const token = req.headers["x-access-token"];
   if (!token) {
@@ -96,4 +112,4 @@ function getDataJWT(req, res) {
   }
 }
 
-module.exports = { signUp, signIn, getDataJWT };
+module.exports = { signUp, signIn, getDataJWT, getDataUser };
