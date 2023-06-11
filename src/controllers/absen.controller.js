@@ -124,4 +124,21 @@ function updateAbsen(req, res) {
   });
 }
 
-module.exports = { sendAbsence, getAbsenByUserId, getAbsen, updateAbsen };
+function absenDetailByUserIdAndMOnth(req,res) {
+  const {id, month} = req.params
+
+  absenRepo.getAbsenByDetailandUserId(id,month,function(err,result) {
+    if(err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong"
+      })
+    }  return res.status(200).json({
+      status:200,
+      message:"Successfully Get Data Absen By Detail",
+      data:result
+    })
+  })
+}
+
+module.exports = { sendAbsence, getAbsenByUserId, getAbsen, updateAbsen,absenDetailByUserIdAndMOnth };
