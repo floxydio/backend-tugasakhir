@@ -10,7 +10,7 @@ function fetchDataKelas(req,res) {
            message: "Something went wrong",
          });
        } else {
-         return res.status(201).json({
+         return res.status(200).json({
            status: 200,
            data: result,
            message: "Successfully Get Data",
