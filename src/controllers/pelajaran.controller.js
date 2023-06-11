@@ -70,7 +70,7 @@ function getAllPelajaran(req, res) {
 }
 
 function insertPelajaran(req, res) {
-  const { nama, guruId, kelasId, jadwalId, createdAt } = req.body;
+  const { nama, guruId, kelasId, jadwalId,jam,createdAt } = req.body;
 
   pelajaranRepo.insertPelajaran(
     nama,
