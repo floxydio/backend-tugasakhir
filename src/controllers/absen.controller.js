@@ -125,7 +125,8 @@ function updateAbsen(req, res) {
 }
 
 function absenDetailByUserIdAndMOnth(req,res) {
-  const {id, month} = req.params
+  const id = req.params.id
+  const month = req.params.month
 
   absenRepo.getAbsenByDetailandUserId(id,month,function(err,result) {
     if(err) {
