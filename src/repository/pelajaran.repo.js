@@ -34,9 +34,9 @@ function findAllByQuery(jadwalId, kelasId, callback) {
   );
 }
 
-function insertPelajaran(nama, guruId, kelasId, jadwalId, createdAt, callback) {
+function insertPelajaran(nama, guruId, kelasId, jadwalId,jam, createdAt, callback) {
   connection.query(
-    `INSERT INTO pelajaran (nama,guru_id,kelas_id,jadwal,createdAt) VALUES ('${nama}','${guruId}','${kelasId}','${jadwalId}','${createdAt}')`,
+    `INSERT INTO pelajaran (nama,guru_id,kelas_id,jadwal,jam,createdAt) VALUES ('${nama}','${guruId}','${kelasId}','${jadwalId}','${jam}','${createdAt}')`,
     function (err, result) {
       if (err) {
         callback(err, null);

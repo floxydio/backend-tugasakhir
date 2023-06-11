@@ -77,6 +77,7 @@ function insertPelajaran(req, res) {
     guruId,
     kelasId,
     jadwalId,
+    jam,
     createdAt,
     function (err, result) {
       if (err) {
