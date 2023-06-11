@@ -15,6 +15,7 @@ const {
   getAbsenByUserId,
   getAbsen,
   updateAbsen,
+  absenDetailByUserIdAndMOnth,
 } = require("../controllers/absen.controller.js");
 const {
   getFindData,
@@ -24,7 +25,6 @@ const {
 } = require("../controllers/pelajaran.controller.js");
 const { findKelas } = require("../controllers/kelas.controller.js");
 const authMiddleware = require("../middleware/auth.js");
-const { getAbsenByDetailandUserId } = require("../repository/absen.repo.js");
 
 function Routes(app) {
   app.get("/", function (req, res) {
@@ -48,7 +48,7 @@ function Routes(app) {
   // Absen --
   app.post("/v1/absen", authMiddleware, sendAbsence);
   app.get("/v1/absen/:id/:month", authMiddleware, getAbsenByUserId);
-  app.get("/v1/absen/detail/:id/:month", authMiddleware, getAbsenByDetailandUserId)
+  app.get("/v1/absen/detail/:id/:month", authMiddleware, absenDetailByUserIdAndMOnth)
   app.get("/v1/absen", authMiddleware, getAbsen);
   app.put("/v1/edit-absen/:id", authMiddleware, updateAbsen);
   // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
