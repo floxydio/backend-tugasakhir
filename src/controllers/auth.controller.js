@@ -129,4 +129,20 @@ function getDataJWT(req, res) {
   }
 }
 
-module.exports = { signUp, signIn, getDataJWT, getDataUser, editProfile };
+function getUserByMurid(req, res) {
+  auth.getSiswaByRole(function(err,result) {
+    if (err) {
+      return res.status(400).json({
+        err: err,
+        message: "Something went wrong",
+      });
+    } else {
+      return res.status(200).json({
+        data: result,
+        message: "Successfully GET User",
+      });
+    }
+  })
+}
+
+module.exports = { signUp, signIn, getDataJWT, getDataUser, editProfile, getUserByMurid };

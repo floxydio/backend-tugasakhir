@@ -9,6 +9,7 @@ const {
   getDataJWT,
   getDataUser,
   editProfile,
+  getUserByMurid,
 } = require("../controllers/auth.controller.js");
 const {
   sendAbsence,
@@ -38,6 +39,7 @@ function Routes(app) {
   app.get("/v1/refresh-token", getDataJWT);
   app.get("/v1/list-users", authMiddleware, getDataUser);
   app.put("/v1/edit-profile/:id", authMiddleware, editProfile);
+  app.get("/v1/siswa-users", getUserByMurid)
   // End Of Auth
 
   // Guru --

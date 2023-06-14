@@ -64,4 +64,15 @@ function signUp(nama, username, password,statususer, userAgent,kelasid, callback
     }
   );
 }
-module.exports = { signUp, signIn, updateUserAgent, getUser, editProfile };
+
+function getSiswaByRole(callback) {
+  connection.query(`SELECT users.id,users.nama,users.notelp,kelas.nomor, kelas.wali FROM users LEFT JOIN kelas ON users.kelas_id = kelas.id WHERE users.status_user = 3
+  `, function (err, result) {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, result);
+    }
+  })
+}
+module.exports = { signUp, signIn, updateUserAgent, getUser, editProfile, getSiswaByRole };
