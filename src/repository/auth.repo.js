@@ -52,7 +52,7 @@ function editProfile(id, nama, password, notelp, callback) {
   );
 }
 
-function signUp(nama, username, password,statususer, userAgent,kelasid callback) {
+function signUp(nama, username, password,statususer, userAgent,kelasid, callback) {
   connection.query(
     `INSERT INTO users(nama,username,password,status_user,user_agent,kelas_id) VALUES ('${nama}','${username}', '${password}','${statususer}','${userAgent}','${kelasid}')`,
     function (err, result) {
