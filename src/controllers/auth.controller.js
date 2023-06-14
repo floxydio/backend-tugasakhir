@@ -78,7 +78,7 @@ function signUp(req, res) {
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(password, salt);
 
-  auth.signUp(nama, username, hash, userAgent, function (err, result) {
+  auth.signUp(nama, username, hash,statususer, userAgent,kelasid, function (err, result) {
     if (err) {
       return res.status(400).json({
         message: "Something went wrong",
