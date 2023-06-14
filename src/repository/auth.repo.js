@@ -52,9 +52,9 @@ function editProfile(id, nama, password, notelp, callback) {
   );
 }
 
-function signUp(nama, username, password, userAgent, callback) {
+function signUp(nama, username, password,statususer, userAgent,kelasid callback) {
   connection.query(
-    `INSERT INTO users(nama,username,password,user_agent) VALUES ('${nama}','${username}', '${password}','${userAgent}')`,
+    `INSERT INTO users(nama,username,password,status_user,user_agent,kelas_id) VALUES ('${nama}','${username}', '${password}','${statususer}','${userAgent}','${kelasid}')`,
     function (err, result) {
       if (err) {
         callback(err, null);

@@ -74,7 +74,7 @@ function editProfile(req, res) {
 
 function signUp(req, res) {
   const saltRounds = 10;
-  const { nama, username, password, userAgent } = req.body;
+  const { nama, username, password,statususer, userAgent, kelasid } = req.body;
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(password, salt);
 
