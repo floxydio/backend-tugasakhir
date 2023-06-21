@@ -27,19 +27,36 @@ function sendAbsence(req, res) {
     year,
     time
   );
-  absenRepo.sendAbsence(data, function (err, result) {
+  absenRepo.checkDayMonthYearPelajaranIdIfExist(data, function (err, result) {
     if (err) {
       return res.status(400).json({
         err: err,
         message: "Something Went Wrong",
       });
     } else {
-      return res.status(200).json({
-        status: 200,
-        message: "Berhasil Absen",
-      });
+      if (result) {
+        return res.status(400).json({
+          err: err,
+          message: "Sudah Absen Hari Ini",
+        });
+      } else {
+        absenRepo.sendAbsence(data, function (err, result) {
+          if (err) {
+            return res.status(400).json({
+              err: err,
+              message: "Something Went Wrong",
+            });
+          } else {
+            return res.status(200).json({
+              status: 200,
+              message: "Berhasil Absen",
+            });
+          }
+        });
+      }
     }
-  });
+  })
+
 }
 
 function getAbsenByUserId(req, res) {

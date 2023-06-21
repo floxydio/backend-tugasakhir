@@ -65,7 +65,7 @@ function Routes(app) {
   // End Of Pelajaran
 
   // Nilai
-  app.get("/v1/nilai/:id", authMiddleware,fetchDataKelas)
+  app.get("/v1/nilai", authMiddleware,fetchDataKelas)
 
   // Kelas
   app.get("/v1/kelas", findKelas);
