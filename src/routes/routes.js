@@ -26,7 +26,7 @@ const {
 } = require("../controllers/pelajaran.controller.js");
 const { findKelas } = require("../controllers/kelas.controller.js");
 const authMiddleware = require("../middleware/auth.js");
-const { fetchDataKelas } = require("../controllers/nilai.controller.js");
+const { fetchDataKelas, fetchAllData } = require("../controllers/nilai.controller.js");
 
 function Routes(app) {
   app.get("/", function (req, res) {
@@ -66,6 +66,7 @@ function Routes(app) {
 
   // Nilai
   app.get("/v1/nilai", authMiddleware,fetchDataKelas)
+  app.get("/v1/nilai-all", authMiddleware,fetchAllData)
 
   // Kelas
   app.get("/v1/kelas", findKelas);
