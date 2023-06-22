@@ -42,4 +42,4 @@ function createNilai(data,callback) {
 }
 
 
-module.exports = {getNilaiByAbsen,getAllDataNilai}
+module.exports = {getNilaiByAbsen,getAllDataNilai,createNilai}
