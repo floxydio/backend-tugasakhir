@@ -1,5 +1,5 @@
 const nilaiRepo = require("../repository/nilai.repo");
-
+const {NilaiEntity} = require("../models/nilai.model");
 
 function fetchDataKelas(req,res) {
   const {id,semester} = req.params
@@ -39,7 +39,8 @@ function fetchAllData(req,res) {
 }
 
 function createNilai(req,res) {
-    const data = req.body
+  const {uts,uas,kelas_id,user_id,semester,pelajaran_id} = req.body
+  const data = new NilaiEntity(uts,uas,kelas_id,user_id,semester,pelajaran_id)
     nilaiRepo.createNilai(data,function(err,result) {
         if (err) {
           return res.status(400).json({
