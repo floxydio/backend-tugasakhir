@@ -31,5 +31,15 @@ function getAllDataNilai(callback) {
    })
 }
 
+function createNilai(data,callback) {
+   connection.query(`INSERT INTO nilai (uts,uas,kelas_id,user_id,semester,pelajaran_id) VALUES ('${data.uts}', '${data.uas}','${data.kelas_id}','${data.user_id}', '${data.semester}', '${data.pelajaran_id}')`,data,function(err, result) {
+      if (err) {
+         callback(err, null);
+       } else {
+         callback(null, result);
+       }
+   })
+}
+
 
 module.exports = {getNilaiByAbsen,getAllDataNilai}
