@@ -1,8 +1,9 @@
 const nilaiRepo = require("../repository/nilai.repo");
 const {NilaiEntity} = require("../models/nilai.model");
 
-function fetchDataKelas(req,res) {
-  const {id,semester} = req.params
+function fetchDataNilai(req,res) {
+  const id = req.query.id
+  const semester = req.query.semester
    nilaiRepo.getNilaiByAbsen(semester,id, function(err,result) {
       if (err) {
          return res.status(400).json({
@@ -57,4 +58,4 @@ function createNilai(req,res) {
     })
 }
 
-module.exports ={fetchDataKelas,fetchAllData,createNilai}
+module.exports ={fetchDataNilai ,fetchAllData,createNilai}

@@ -34,6 +34,7 @@ function sendAbsence(req, res) {
         message: "Something Went Wrong",
       });
     } else {
+      
       if (result) {
         return res.status(400).json({
           err: err,
