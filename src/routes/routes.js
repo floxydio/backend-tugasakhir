@@ -66,7 +66,7 @@ function Routes(app) {
 
   // Nilai
   app.get("/v1/nilai", authMiddleware,fetchDataKelas)
-  app.get("/v1/nilai-all", authMiddleware,fetchAllData)
+  app.get("/v1/nilai-all",fetchAllData)
 
   // Kelas
   app.get("/v1/kelas", findKelas);
