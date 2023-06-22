@@ -21,6 +21,7 @@ function fetchDataKelas(req,res) {
 
 
 function fetchAllData(req,res) {
+
     nilaiRepo.getAllDataNilai(function(err,result) {
         if (err) {
           return res.status(400).json({

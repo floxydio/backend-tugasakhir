@@ -22,7 +22,7 @@ function getNilaiByAbsen(semester,userid,callback) {
 }
 
 function getAllDataNilai(callback) {
-   connection.query(`SELECT users.nama,kelas.nomor,nilai.uts,nilai.uas,nilai.semester, pelajaran.nama FROM nilai LEFT JOIN pelajaran ON nilai.pelajaran_id = pelajaran.id LEFT JOIN kelas ON nilai.kelas_id LEFT JOIN users ON nilai.user_id = users.id`,function(err, result) {
+   connection.query(`SELECT users.nama,kelas.nomor,nilai.uts,nilai.uas,nilai.semester, pelajaran.nama as nama_pelajaran FROM nilai LEFT JOIN pelajaran ON nilai.pelajaran_id = pelajaran.id LEFT JOIN kelas ON nilai.kelas_id LEFT JOIN users ON nilai.user_id = users.id`,function(err, result) {
       if (err) {
          callback(err, null);
        } else {
