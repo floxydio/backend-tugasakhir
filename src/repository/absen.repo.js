@@ -15,7 +15,7 @@ function sendAbsence(body, callback) {
 
 function checkDayMonthYearPelajaranIdIfExist(body, callback) {
   connection.query(
-    `SELECT * FROM absen WHERE day = '${body.day}' AND month = '${body.month}' AND year = '${body.year}' AND pelajaran_id = '${body.pelajaran_id}'`,
+    `SELECT * FROM absen WHERE day = '${body.day}' AND month = '${body.month}' AND year = '${body.year}' AND pelajaran_id = '${body.pelajaran_id}' AND user_id = '${body.user_id}'`,
     function (err, result) {
       if (err) {
         callback(err, null);
