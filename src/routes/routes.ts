@@ -1,45 +1,27 @@
-const {
-  findAllGuru,
-  createGuru,
-  editGuru,
-} = require("../controllers/teacher.controller.js");
-const {
-  signUp,
-  signIn,
-  getDataJWT,
-  getDataUser,
-  editProfile,
-  getUserByMurid,
-} = require("../controllers/auth.controller.js");
-const {
-  sendAbsence,
-  getAbsenByUserId,
-  getAbsen,
-  updateAbsen,
-  absenDetailByUserIdAndMOnth,
-} = require("../controllers/absen.controller.js");
-const {
-  getFindData,
-  insertPelajaran,
-  findAllData,
-  getAllPelajaran,
-} = require("../controllers/pelajaran.controller.js");
-const { findKelas } = require("../controllers/kelas.controller.js");
-const authMiddleware = require("../middleware/auth.js");
-const { fetchDataNilai, fetchAllData, createNilai } = require("../controllers/nilai.controller.js");
+import express, { Express, Request, Response } from 'express';
+import { AuthController } from '../controllers/auth.controller';
+import { middlewareAuth } from '../middleware/auth';
 
-function Routes(app) {
+
+
+export default function Routes(app: Express) {
   app.get("/", function (req, res) {
     res.send("Api Running  🚀\n\n\nAsk Dio if have question");
   });
 
+  // Middleware
+  const authMiddleware = new middlewareAuth().authenticatetoken
+
+  // Controller
+  const userController = new AuthController()
+
   // Auth --
-  app.post("/v1/sign-up", signUp);
-  app.post("/v1/sign-in", signIn);
-  app.get("/v1/refresh-token", getDataJWT);
-  app.get("/v1/list-users", authMiddleware, getDataUser);
-  app.put("/v1/edit-profile/:id", authMiddleware, editProfile);
-  app.get("/v1/siswa-users", getUserByMurid)
+  app.post("/v1/sign-up", userController.signUp);
+  app.post("/v1/sign-in", userController.signIn);
+  app.get("/v1/refresh-token", userController.getDecodeJWT);
+  app.get("/v1/list-users", authMiddleware, userController.getUserFromStatusUser);
+  app.put("/v1/edit-profile/:id", authMiddleware, userController.editProfile);
+  app.get("/v1/siswa-users", userController.getUserByMurid)
   // End Of Auth
 
   // Guru --
@@ -66,12 +48,10 @@ function Routes(app) {
 
   // Nilai
   app.get("/v1/nilai", fetchDataNilai)
-  app.get("/v1/nilai-all",fetchAllData)
+  app.get("/v1/nilai-all", fetchAllData)
   app.post("/v1/create-nilai", createNilai)
 
   // Kelas
   app.get("/v1/kelas", findKelas);
   //End Of Kelas
 }
-
-module.exports = { Routes };
