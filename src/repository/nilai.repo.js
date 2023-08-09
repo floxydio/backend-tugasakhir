@@ -14,7 +14,7 @@ function getNilaiByAbsen(semester,userid,callback) {
          if (err) {
             callback(err, null);
           } else {
-            callback(null, result);
+            acllback(null, result);
           }
       })
    }
