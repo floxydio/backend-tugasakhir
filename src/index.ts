@@ -18,6 +18,6 @@ app.use(compression())
 
 Routes(app);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server Running on -> ${process.env.PORT} || Development Mode`);
+app.listen(process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW, () => {
+  console.log(`Server Running on -> ${process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW} || ${process.env.NODE_ENV === "development" ? "Development" : "Production"} Mode`);
 });
