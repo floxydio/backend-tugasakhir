@@ -1,9 +1,3 @@
-// const bodyParser = require("body-parser");
-// const express = require("express");
-// const cors = require("cors");
-// const app = express();
-// const port = 3000;
-// const { Routes } = require("./src/routes/routes");
 import express, { Express } from 'express';
 import Routes from './routes/routes';
 import dotenv from 'dotenv'
@@ -25,5 +19,5 @@ app.use(compression())
 Routes(app);
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server Running`);
+  console.log(`Server Running on -> ${process.env.PORT} || Development Mode`);
 });

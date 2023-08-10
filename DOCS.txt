@@ -1,3 +1,0 @@
---- users ---
-status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
-status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']

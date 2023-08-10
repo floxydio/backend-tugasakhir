@@ -4,6 +4,8 @@ import { middlewareAuth } from '../middleware/auth';
 import { GuruController } from '../controllers/guru.controller';
 import { KelasController } from '../controllers/kelas.controller';
 import { NilaiController } from '../controllers/nilai.controller';
+import { PelajaranController } from '../controllers/pelajaran.controller';
+import { AbsenController } from '../controllers/absen.controller';
 
 
 
@@ -20,6 +22,9 @@ export default function Routes(app: Express) {
   const guruController = new GuruController()
   const kelasController = new KelasController()
   const nilaiController = new NilaiController()
+  const pelajaranController = new PelajaranController()
+  const absenController = new AbsenController()
+
 
   // Auth --
   app.post("/v1/sign-up", userController.signUp);
@@ -37,19 +42,19 @@ export default function Routes(app: Express) {
   // End Of Guru
 
   // Absen --
-  // app.post("/v1/absen", authMiddleware, sendAbsence);
-  // app.get("/v1/absen/:id/:month", authMiddleware, getAbsenByUserId);
-  // app.get("/v1/absen/detail/:id/:month", authMiddleware, absenDetailByUserIdAndMOnth)
-  // app.get("/v1/absen", authMiddleware, getAbsen);
-  // app.put("/v1/edit-absen/:id", authMiddleware, updateAbsen);
-  // app.get("/v1/total-absen/:userId/:bulan", getTotalAbsenByMonth);
+  app.post("/v1/absen", authMiddleware, absenController.sendAbsence);
+  app.get("/v1/absen/:id/:month", authMiddleware, absenController.getAbsenByUserId);
+  app.get("/v1/absen/detail/:id/:month", authMiddleware, absenController.absenDetailByUserIdAndMOnth)
+  app.get("/v1/absen", authMiddleware, absenController.getAbsen);
+  app.put("/v1/edit-absen/:id", authMiddleware, absenController.updateAbsen);
+  // app.get("/v1/total-absen/:userId/:bulan", absenController.getTotalAbsenByMonth);
   // End Of Absen --
 
   // Pelajaran -
-  // app.get("/v1/pelajaran", findAllData);
-  // app.get("/v1/find-pelajaran", getAllPelajaran);
-  // app.get("/v1/pelajaran/:id/:kelas", authMiddleware, getFindData);
-  // app.post("/v1/create-pelajaran", authMiddleware, insertPelajaran);
+  app.get("/v1/pelajaran", pelajaranController.findPelajaran);
+  app.get("/v1/find-pelajaran", pelajaranController.findAllDataPelajaran);
+  app.get("/v1/pelajaran/:id/:kelas", authMiddleware, pelajaranController.findAllData);
+  app.post("/v1/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
   // End Of Pelajaran
 
   // Nilai
