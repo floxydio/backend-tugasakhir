@@ -73,7 +73,6 @@ export class AuthController {
     const uuid = uuidv4()
 
     if (!fileUpload) {
-      console.log(1)
       if (password !== undefined) {
         try {
           const salt = bcrypt.genSaltSync(saltRounds);
