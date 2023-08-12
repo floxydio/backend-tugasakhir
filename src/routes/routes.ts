@@ -58,11 +58,11 @@ export default function Routes(app: Express) {
 
 
   // Auth --
-  app.post("/v1/sign-up", userController.signUp);
-  app.post("/v1/sign-in", userController.signIn);
-  app.get("/v1/refresh-token", userController.getDecodeJWT);
-  app.get("/v1/list-users", authMiddleware, userController.getUserFromStatusUser);
-  app.put("/v1/edit-profile/:id", authMiddleware, upload.single("profile"), userController.editProfile, (error: Error, req: Request, res: Response, next: NextFunction) => {
+  app.post("/v2/sign-up", userController.signUp);
+  app.post("/v2/sign-in", userController.signIn);
+  app.get("/v2/refresh-token", userController.getDecodeJWT);
+  app.get("/v2/list-users", authMiddleware, userController.getUserFromStatusUser);
+  app.put("/v2/edit-profile/:id", authMiddleware, upload.single("profile"), userController.editProfile, (error: Error, req: Request, res: Response, next: NextFunction) => {
     if (error) {
       return res.status(400).json({
         error: true,
@@ -71,37 +71,37 @@ export default function Routes(app: Express) {
     }
     next();
   });
-  app.get("/v1/siswa-users", userController.getUserByMurid)
+  app.get("/v2/siswa-users", userController.getUserByMurid)
   // End Of Auth
 
   // Guru --
-  app.get("/v1/guru", guruController.findAllGuru);
-  app.post("/v1/guru", authMiddleware, guruController.createGuru);
-  app.put("/v1/edit-guru/:id", authMiddleware, guruController.editGuru);
+  app.get("/v2/guru", guruController.findAllGuru);
+  app.post("/v2/guru", authMiddleware, guruController.createGuru);
+  app.put("/v2/edit-guru/:id", authMiddleware, guruController.editGuru);
   // End Of Guru
 
   // Absen --
-  app.post("/v1/absen", authMiddleware, absenController.sendAbsence);
-  app.get("/v1/absen/:id/:month", authMiddleware, absenController.getAbsenByUserId);
-  app.get("/v1/absen/detail/:id/:month", authMiddleware, absenController.absenDetailByUserIdAndMOnth)
-  app.get("/v1/absen", authMiddleware, absenController.getAbsen);
-  app.put("/v1/edit-absen/:id", authMiddleware, absenController.updateAbsen);
-  // app.get("/v1/total-absen/:userId/:bulan", absenController.getTotalAbsenByMonth);
+  app.post("/v2/absen", authMiddleware, absenController.sendAbsence);
+  app.get("/v2/absen/:id/:month", authMiddleware, absenController.getAbsenByUserId);
+  app.get("/v2/absen/detail/:id/:month", authMiddleware, absenController.absenDetailByUserIdAndMOnth)
+  app.get("/v2/absen", authMiddleware, absenController.getAbsen);
+  app.put("/v2/edit-absen/:id", authMiddleware, absenController.updateAbsen);
+  // app.get("/v2/total-absen/:userId/:bulan", absenController.getTotalAbsenByMonth);
   // End Of Absen --
 
   // Pelajaran -
-  app.get("/v1/pelajaran", pelajaranController.findPelajaran);
-  app.get("/v1/find-pelajaran", pelajaranController.findAllDataPelajaran);
-  app.get("/v1/pelajaran/:id/:kelas", authMiddleware, pelajaranController.findAllData);
-  app.post("/v1/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
+  app.get("/v2/pelajaran", pelajaranController.findPelajaran);
+  app.get("/v2/find-pelajaran", pelajaranController.findAllDataPelajaran);
+  app.get("/v2/pelajaran/:id/:kelas", authMiddleware, pelajaranController.findAllData);
+  app.post("/v2/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
   // End Of Pelajaran
 
   // Nilai
-  app.get("/v1/nilai", nilaiController.fetchDataNilai)
-  app.get("/v1/nilai-all", nilaiController.fetchAllData)
-  app.post("/v1/create-nilai", nilaiController.createNilai)
+  app.get("/v2/nilai", nilaiController.fetchDataNilai)
+  app.get("/v2/nilai-all", nilaiController.fetchAllData)
+  app.post("/v2/create-nilai", nilaiController.createNilai)
 
   // Kelas
-  app.get("/v1/kelas", kelasController.findKelas);
+  app.get("/v2/kelas", kelasController.findKelas);
   //End Of Kelas
 }
