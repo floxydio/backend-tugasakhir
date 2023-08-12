@@ -57,7 +57,7 @@ export default function Routes(app: Express) {
   const absenController = new AbsenController()
 
   // Static
-  app.use("/img-profile", express.static(__dirname + '/storage/profile'))
+  app.use("/img-profile", express.static("src/storage/profile"))
 
   // Auth --
   app.post("/v2/sign-up", userController.signUp);
