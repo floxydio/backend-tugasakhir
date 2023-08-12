@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { middlewareAuth } from '../middleware/auth';
 import { GuruController } from '../controllers/guru.controller';
@@ -6,8 +6,39 @@ import { KelasController } from '../controllers/kelas.controller';
 import { NilaiController } from '../controllers/nilai.controller';
 import { PelajaranController } from '../controllers/pelajaran.controller';
 import { AbsenController } from '../controllers/absen.controller';
+import multer from "multer"
+import { v4 as uuidv4 } from 'uuid';
+import path from "path"
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './src/storage/profile')
+  },
+  filename: function (req, file, cb) {
+    const uuid = uuidv4()
+    cb(null, uuid + path.extname(file.originalname))
+  },
 
+})
+
+const upload = multer({
+  storage: storage, limits: { fileSize: 1 * 1024 * 1024 }, // 3MB
+  fileFilter: function (req, file, cb) {
+    const filetypes = /jpeg|jpg|png/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else if (!mimetype) {
+      return cb(new Error('Unsupported file type. Please upload a JPEG or PNG file.'));
+    } else if (!extname) {
+      return cb(new Error('File extension does not match the file type. Please upload a valid JPEG or PNG file.'));
+    } else {
+      return cb(new Error('Something went wrong. Please try again.'));
+    }
+  }
+})
 
 export default function Routes(app: Express) {
   app.get("/", function (req, res) {
@@ -31,7 +62,15 @@ export default function Routes(app: Express) {
   app.post("/v1/sign-in", userController.signIn);
   app.get("/v1/refresh-token", userController.getDecodeJWT);
   app.get("/v1/list-users", authMiddleware, userController.getUserFromStatusUser);
-  app.put("/v1/edit-profile/:id", authMiddleware, userController.editProfile);
+  app.put("/v1/edit-profile/:id", authMiddleware, upload.single("profile"), userController.editProfile, (error: Error, req: Request, res: Response, next: NextFunction) => {
+    if (error) {
+      return res.status(400).json({
+        error: true,
+        message: error.message
+      })
+    }
+    next();
+  });
   app.get("/v1/siswa-users", userController.getUserByMurid)
   // End Of Auth
 

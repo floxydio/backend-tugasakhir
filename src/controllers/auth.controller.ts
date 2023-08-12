@@ -1,11 +1,14 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { prisma } from "../config/database"
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
 import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import dotenv from "dotenv"
+import multer, { MulterError } from "multer";
+import { v4 as uuidv4 } from 'uuid';
+import path from "path";
 
 dotenv.config()
 export class AuthController {
@@ -14,6 +17,14 @@ export class AuthController {
 
     try {
       const result = await prisma.users.findMany({
+        select: {
+          id: true,
+          nama: true,
+          status_role: true,
+          password: true,
+          kelas_id: true,
+          username: true,
+        },
         where: {
           username: username
         }
@@ -57,43 +68,91 @@ export class AuthController {
   public async editProfile(req: Request, res: Response) {
     const saltRounds = 10;
     const { nama, password, notelp } = req.body;
+    const fileUpload = req.file
     const { id } = req.params;
-    if (password !== "" || password !== undefined) {
-      const salt = bcrypt.genSaltSync(saltRounds);
-      const hash = bcrypt.hashSync(password, salt);
-      try {
-        await prisma.users.update({
-          where: {
-            id: Number(id)
-          }, data: {
-            nama: nama,
-            password: hash,
-            notelp: notelp
-          }
-        }).then(() => {
-          const successRes = StatusCode.SUCCESS
-          return successResponseOnlyMessage(res, "Sukses Edit Profile", successRes)
-        })
-      } catch (e) {
-        const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-        return failedResponse(res, true, "Something Went Wrong", failedRes)
+    const uuid = uuidv4()
+
+    if (!fileUpload) {
+      console.log(1)
+      if (password !== undefined) {
+        try {
+          const salt = bcrypt.genSaltSync(saltRounds);
+          const hash = bcrypt.hashSync(password, salt);
+          await prisma.users.update({
+            where: {
+              id: Number(id)
+            }, data: {
+              nama: nama,
+              password: hash,
+              notelp: notelp,
+            }
+          }).then(() => {
+            const successRes = StatusCode.SUCCESS
+            return successResponseOnlyMessage(res, "Sukses Edit Profile", successRes)
+          })
+        } catch (e) {
+          const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+          return failedResponse(res, true, "Something Went Wrong", failedRes)
+        }
+      } else if (password === undefined) {
+        try {
+          await prisma.users.update({
+            where: {
+              id: Number(id)
+            }, data: {
+              nama: nama,
+              notelp: notelp,
+            }
+          }).then(() => {
+            const successRes = StatusCode.SUCCESS
+            return successResponseOnlyMessage(res, "Sukses Edit Profile", successRes)
+          })
+        } catch (e) {
+          const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+          return failedResponse(res, true, "Something Went Wrong", failedRes)
+        }
       }
     } else {
-      try {
-        await prisma.users.update({
-          where: {
-            id: Number(id)
-          }, data: {
-            nama: nama,
-            notelp: notelp
-          }
-        }).then(() => {
-          const successRes = StatusCode.SUCCESS
-          return successResponseOnlyMessage(res, "Sukses Edit Profile", successRes)
-        })
-      } catch (e) {
-        const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-        return failedResponse(res, true, "Something Went Wrong", failedRes)
+      if (password !== undefined) {
+        try {
+          const salt = bcrypt.genSaltSync(saltRounds);
+          const hash = bcrypt.hashSync(password, salt);
+          await prisma.users.update({
+            where: {
+              id: Number(id)
+            }, data: {
+              nama: nama,
+              password: hash,
+              notelp: notelp,
+              profile_pic: req.file?.filename
+            }
+          }).then(() => {
+            const successRes = StatusCode.SUCCESS
+            return successResponseOnlyMessage(res, "Sukses Edit Profile", successRes)
+          })
+        } catch (e) {
+          const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+          return failedResponse(res, true, "Something Went Wrong", failedRes)
+        }
+      } else if (password === undefined) {
+        try {
+          await prisma.users.update({
+            where: {
+              id: Number(id)
+            }, data: {
+              nama: nama,
+              notelp: notelp,
+              profile_pic: req.file?.filename
+
+            }
+          }).then(() => {
+            const successRes = StatusCode.SUCCESS
+            return successResponseOnlyMessage(res, "Sukses Edit Profile", successRes)
+          })
+        } catch (e) {
+          const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+          return failedResponse(res, true, "Something Went Wrong", failedRes)
+        }
       }
     }
 
@@ -111,7 +170,7 @@ export class AuthController {
           nama: nama,
           username: username,
           password: hash,
-          status_user: statususer,
+          status_user: Number(0),
           user_agent: req.headers["user-agent"],
           kelas_id: kelasid
         }
@@ -130,11 +189,19 @@ export class AuthController {
   public async getUserFromStatusUser(req: Request, res: Response) {
     try {
       const user = await prisma.users.findMany({
+        select: {
+          id: true,
+          nama: true,
+          status_user: true,
+          status_role: true,
+          notelp: true,
+          kelas_id: true
+        },
         where: {
           status_user: 3
         }
       })
-      const successRes = StatusCode.CREATED
+      const successRes = StatusCode.SUCCESS
       return successResponse(res, user, "Successfully Get User Status User 3", successRes)
     } catch (e) {
       const failedRes = StatusCode.INTERNAL_SERVER_ERROR
@@ -149,7 +216,7 @@ export class AuthController {
       const errorStatus = StatusCode.BAD_REQUEST
       return failedResponse(res, true, "Token Not Found", errorStatus)
     } else {
-      jwt.verify(token.toString(), "dev_token", function (err, decoded: any) {
+      jwt.verify(token.toString(), `${process.env.JWT_TOKEN_SECRET}`, function (err, decoded: any) {
         if (err) {
           const errorStatus = StatusCode.BAD_REQUEST
           return failedResponse(res, true, "Token Not Found", errorStatus)

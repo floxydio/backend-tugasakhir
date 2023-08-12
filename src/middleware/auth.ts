@@ -6,8 +6,8 @@ dotenv.config()
 
 export class middlewareAuth {
   public authenticatetoken(req: Request, res: Response, next: NextFunction) {
-    const authHeader = req.header("x-access-token");
-    const token = authHeader && authHeader?.split(' ')[1];
+    const token = req.header("x-access-token");
+
 
     if (token == null) {
       return res.status(401).json({

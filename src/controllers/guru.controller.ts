@@ -95,13 +95,13 @@ export class GuruController {
   }
 
   public async createGuru(req: Request, res: Response) {
-    const { nama, mengajar, status_guru, rating } = req.body;
+    const { nama, mengajar, rating } = req.body;
     try {
       await prisma.guru.create({
         data: {
           nama: nama,
           mengajar: mengajar,
-          status_guru: status_guru,
+          status_guru: Number(1),
           rating: rating
         }
       }).then(() => {

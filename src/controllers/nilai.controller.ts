@@ -15,12 +15,12 @@ export class NilaiController {
       if (semester === undefined) {
         await prisma.$queryRaw`SELECT nilai.*, pelajaran.nama FROM nilai LEFT JOIN pelajaran ON nilai.pelajaran_id = pelajaran.id WHERE user_id = ${id}`.then((n) => {
           const successRes = StatusCode.SUCCESS
-          return successResponse(res, n, "Successfully GET Kelas", successRes)
+          return successResponse(res, n, "Successfully GET Nilai", successRes)
         })
       } else {
         await prisma.$queryRaw`SELECT nilai.*, pelajaran.nama FROM nilai LEFT JOIN pelajaran ON nilai.pelajaran_id = pelajaran.id WHERE user_id = ${id} AND semester = ${semester}`.then((n) => {
           const successRes = StatusCode.SUCCESS
-          return successResponse(res, n, "Successfully GET Kelas", successRes)
+          return successResponse(res, n, "Successfully GET Nilai", successRes)
         })
       }
     } catch (e) {
@@ -34,7 +34,7 @@ export class NilaiController {
     try {
       await prisma.$queryRaw`SELECT users.nama,kelas.nomor,nilai.uts,nilai.uas,nilai.semester, pelajaran.nama as nama_pelajaran FROM nilai LEFT JOIN pelajaran ON nilai.pelajaran_id = pelajaran.id LEFT JOIN kelas ON nilai.kelas_id LEFT JOIN users ON nilai.user_id = users.id`.then((n) => {
         const successRes = StatusCode.SUCCESS
-        return successResponse(res, n, "Successfully GET Kelas", successRes)
+        return successResponse(res, n, "Successfully GET Nilai", successRes)
       })
 
     } catch (e) {
