@@ -56,6 +56,8 @@ export default function Routes(app: Express) {
   const pelajaranController = new PelajaranController()
   const absenController = new AbsenController()
 
+  // Static
+  app.use("/img-profile", express.static(__dirname + '/storage/profile'))
 
   // Auth --
   app.post("/v2/sign-up", userController.signUp);
