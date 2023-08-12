@@ -64,6 +64,7 @@ export default function Routes(app: Express) {
   app.post("/v2/sign-in", userController.signIn);
   app.get("/v2/refresh-token", userController.getDecodeJWT);
   app.get("/v2/list-users", authMiddleware, userController.getUserFromStatusUser);
+  app.get("/v2/profile-image/token", authMiddleware, userController.getProfileImage)
   app.put("/v2/edit-profile/:id", authMiddleware, upload.single("profile"), userController.editProfile, (error: Error, req: Request, res: Response, next: NextFunction) => {
     if (error) {
       return res.status(400).json({

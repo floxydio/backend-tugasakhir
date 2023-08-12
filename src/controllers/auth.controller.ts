@@ -240,5 +240,28 @@ export class AuthController {
     }
   }
 
+  public async getProfileImage(req: Request, res: Response) {
+    try {
+      jwt.verify(req.params.token, `${process.env.JWT_TOKEN_SECRET}`, async function (err, decode: any) {
+        if (err) {
+          const errorStatus = StatusCode.BAD_REQUEST
+          return failedResponse(res, true, "Token Not Found", errorStatus)
+        } else {
+          await prisma.users.findFirst({
+            where: {
+              id: decode.data.id
+            },
+            select: {
+              profile_pic: true,
+            }
+          }).then((p) => {
+            const successStatus = StatusCode.SUCCESS
+            return successResponse(res, p, "Sukses Get User By Image", successStatus)
+          })
+        }
+      })
+    } catch { }
+  }
+
 
 }
