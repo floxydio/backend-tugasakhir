@@ -6,7 +6,7 @@
   "scripts": {
     "dev-ts": "nodemon src/index.ts",
     "dev-js": "nodemon --exitcrash dist/index.js",
-    "dev-prod": "tsc --build && nodemon --exitcrash dist/index.js"
+    "dev-prod": "tsc --build"
   },
   "keywords": [],
   "author": "Dio Okta R",
