@@ -20,9 +20,9 @@ export class PelajaranController {
     }
   }
   public async findAllData(req: Request, res: Response) {
-    const { jadwalId, kelasId } = req.params
+    const { week, kelas } = req.params
     try {
-      await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id WHERE pelajaran.jadwal = ${jadwalId} AND pelajaran.kelas_id = ${kelasId}`.then((p) => {
+      await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id WHERE pelajaran.jadwal = ${week} AND pelajaran.kelas_id = ${kelas}`.then((p) => {
         const successRes = StatusCode.SUCCESS
         return successResponse(res, p, "Successfully GET Pelajaran", successRes)
       })

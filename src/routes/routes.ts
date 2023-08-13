@@ -95,7 +95,7 @@ export default function Routes(app: Express) {
   // Pelajaran -
   app.get("/v2/pelajaran", pelajaranController.findPelajaran);
   app.get("/v2/find-pelajaran", pelajaranController.findAllDataPelajaran);
-  app.get("/v2/pelajaran/:id/:kelas", authMiddleware, pelajaranController.findAllData);
+  app.get("/v2/pelajaran/:week/:kelas", authMiddleware, pelajaranController.findAllData);
   app.post("/v2/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
   // End Of Pelajaran
 
