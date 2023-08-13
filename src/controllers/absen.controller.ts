@@ -43,6 +43,7 @@ export class AbsenController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
+      console.log(e);
       return failedResponse(res, true, "Something Went Wrong", errorStatus)
 
     }
