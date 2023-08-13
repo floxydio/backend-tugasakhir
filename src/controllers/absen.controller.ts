@@ -25,15 +25,15 @@ export class AbsenController {
     try {
       await prisma.absen.create({
         data: {
-          user_id: user_id,
-          guru_id: guru_id,
-          pelajaran_id: pelajaran_id,
-          kelas_id: kelas_id,
+          user_id: Number(user_id),
+          guru_id: Number(guru_id),
+          pelajaran_id: Number(pelajaran_id),
+          kelas_id: Number(kelas_id),
           keterangan: keterangan,
           reason: reason,
-          day: day,
-          month: month,
-          year: year,
+          day: Number(day),
+          month: Number(month),
+          year: Number(year),
           time: time
         }
       }).then(() => {
@@ -43,8 +43,7 @@ export class AbsenController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      console.log(e);
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong: ${e}`, errorStatus)
 
     }
 
