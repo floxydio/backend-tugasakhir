@@ -14,7 +14,7 @@ export class KelasController {
       return successResponse(res, data, "Successfully GET Kelas", successRes)
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
 }

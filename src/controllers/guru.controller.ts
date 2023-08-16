@@ -90,7 +90,7 @@ export class GuruController {
       }
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
 
@@ -111,7 +111,7 @@ export class GuruController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
 
   }
@@ -137,7 +137,7 @@ export class GuruController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
 }

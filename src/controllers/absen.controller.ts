@@ -60,7 +60,7 @@ export class AbsenController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
 
   }
@@ -115,7 +115,7 @@ export class AbsenController {
       }
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
 
 
@@ -159,7 +159,7 @@ export class AbsenController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
 
     }
   }
@@ -176,7 +176,7 @@ export class AbsenController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
 
   }
@@ -192,7 +192,7 @@ export class AbsenController {
       jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (err: any, decode: any) {
         if (err) {
           const status = StatusCode.UNAUTHORIZED
-          return failedResponse(res, true, "Something Went Wrong", status)
+          return failedResponse(res, true, `Something Went Wrong:${err}`, status)
 
         } else {
           if (decode.data.role === 2) {
@@ -231,7 +231,7 @@ export class AbsenController {
       })
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
 
     }
 

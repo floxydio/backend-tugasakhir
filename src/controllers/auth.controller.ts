@@ -69,7 +69,7 @@ export class AuthController {
       }
     } catch (e) {
       const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-      return failedResponse(res, true, "Something Went Wrong", failedRes)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
     }
   }
 
@@ -99,7 +99,7 @@ export class AuthController {
           })
         } catch (e) {
           const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-          return failedResponse(res, true, "Something Went Wrong", failedRes)
+          return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
         }
       } else if (password === undefined) {
         try {
@@ -116,7 +116,7 @@ export class AuthController {
           })
         } catch (e) {
           const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-          return failedResponse(res, true, "Something Went Wrong", failedRes)
+          return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
         }
       }
     } else {
@@ -139,7 +139,7 @@ export class AuthController {
           })
         } catch (e) {
           const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-          return failedResponse(res, true, "Something Went Wrong", failedRes)
+          return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
         }
       } else if (password === undefined) {
         try {
@@ -158,7 +158,7 @@ export class AuthController {
           })
         } catch (e) {
           const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-          return failedResponse(res, true, "Something Went Wrong", failedRes)
+          return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
         }
       }
     }
@@ -189,7 +189,7 @@ export class AuthController {
 
     } catch (e) {
       const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-      return failedResponse(res, true, "Something Went Wrong", failedRes)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
     }
 
   }
@@ -213,7 +213,7 @@ export class AuthController {
       return successResponse(res, user, "Successfully Get User Status User 3", successRes)
     } catch (e) {
       const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-      return failedResponse(res, true, "Something Went Wrong", failedRes)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
 
     }
   }
@@ -244,7 +244,7 @@ export class AuthController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
 
     }
   }

@@ -25,7 +25,7 @@ export class NilaiController {
       }
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
 
@@ -39,7 +39,7 @@ export class NilaiController {
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
-      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
 
@@ -60,7 +60,8 @@ export class NilaiController {
         return successResponseOnlyMessage(res, "Successfully Create Nilai", successRes)
       })
     } catch (e) {
-
+      const errorStatus = StatusCode.BAD_REQUEST
+      return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
 
   }
