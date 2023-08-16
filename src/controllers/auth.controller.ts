@@ -21,6 +21,7 @@ export class AuthController {
           id: true,
           nama: true,
           status_role: true,
+          status_user: true,
           password: true,
           kelas_id: true,
           username: true,
@@ -33,30 +34,37 @@ export class AuthController {
         const status = StatusCode.BAD_REQUEST
         return successResponse(res, [], "Username / Email Tidak Ditemukan", status)
       } else {
-        const hash = result[0].password
-        const compare = bcrypt.compareSync(password, hash);
-        if (compare) {
-          const token = jwt.sign(
-            {
-              data: {
-                id: result[0].id,
-                nama: result[0].nama,
-                role: result[0].status_role,
-                kelas_id: result[0].kelas_id,
+        if (result[0].status_user === 0 || result[0].status_user === 2) {
+          const status = StatusCode.BAD_REQUEST
+          return failedResponse(res, true, "User Not Active", status)
+        } else {
+          const hash = result[0].password
+          const compare = bcrypt.compareSync(password, hash);
+          if (compare) {
+            // status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
+            // status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']
+            const token = jwt.sign(
+              {
+                data: {
+                  id: result[0].id,
+                  nama: result[0].nama,
+                  role: result[0].status_role,
+                  kelas_id: result[0].kelas_id,
+                },
               },
-            },
-            `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
-          );
-          await prisma.users.update({
-            where: {
-              username: result[0].username
-            },
-            data: {
-              user_agent: req.headers["user-agent"]
-            }
-          })
-          const successLogin = StatusCode.SUCCESS
-          return successResponseOnlyMessageToken(res, token, "Berhasil Login", successLogin)
+              `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
+            );
+            await prisma.users.update({
+              where: {
+                username: result[0].username
+              },
+              data: {
+                user_agent: req.headers["user-agent"]
+              }
+            })
+            const successLogin = StatusCode.SUCCESS
+            return successResponseOnlyMessageToken(res, token, "Berhasil Login", successLogin)
+          }
         }
       }
     } catch (e) {
@@ -171,6 +179,7 @@ export class AuthController {
           password: hash,
           status_user: Number(0),
           user_agent: req.headers["user-agent"],
+          status_role: Number(0),
           kelas_id: kelasid
         }
       }).then(() => {

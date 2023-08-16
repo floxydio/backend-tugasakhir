@@ -95,3 +95,33 @@ model users {
   notelp      Int     @default(0)
   kelas_id    Int?
 }
+
+model todo {
+  id    Int    @id @default(autoincrement())
+  title String @db.VarChar(255)
+}
+
+model ujian {
+  id             Int      @id @default(autoincrement())
+  nama_ujian     String   @db.VarChar(255)
+  tanggal        DateTime @db.Date
+  mata_pelajaran Int
+  durasi         Int
+  soal           String   @db.Text
+  jam_mulai      String   @db.VarChar(255)
+  keterangan     String   @db.VarChar(255)
+  status_ujian   Int      @default(0)
+  total_soal     Int
+  createdAt      DateTime @db.Date
+}
+
+model absen_guru {
+  id               Int     @id @default(autoincrement())
+  user_id          Int
+  day              Int
+  month            Int
+  year             Int
+  time             String  @db.VarChar(255)
+  keterangan       String  @db.VarChar(255)
+  sakit_keterangan String? @db.VarChar(255)
+}

@@ -9,6 +9,7 @@ import { AbsenController } from '../controllers/absen.controller';
 import multer from "multer"
 import { v4 as uuidv4 } from 'uuid';
 import path from "path"
+import { UjianController } from '../controllers/ujian.controller';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -55,6 +56,7 @@ export default function Routes(app: Express) {
   const nilaiController = new NilaiController()
   const pelajaranController = new PelajaranController()
   const absenController = new AbsenController()
+  const ujianController = new UjianController()
 
   // Static
   app.use("/img-profile", express.static("src/storage/profile"))
@@ -89,6 +91,9 @@ export default function Routes(app: Express) {
   app.get("/v2/absen/detail/:id/:month", authMiddleware, absenController.absenDetailByUserIdAndMOnth)
   app.get("/v2/absen", authMiddleware, absenController.getAbsen);
   app.put("/v2/edit-absen/:id", authMiddleware, absenController.updateAbsen);
+
+  // Guru Absen -- 
+  app.post("/v2/guru-absen", authMiddleware, absenController.absenGuru)
   // app.get("/v2/total-absen/:userId/:bulan", absenController.getTotalAbsenByMonth);
   // End Of Absen --
 
@@ -107,4 +112,9 @@ export default function Routes(app: Express) {
   // Kelas
   app.get("/v2/kelas", kelasController.findKelas);
   //End Of Kelas
+
+  // Ujian
+  app.post("/v2/create-ujian", ujianController.createUjian)
+  app.get("/v2/ujian", ujianController.getUjian)
+  //End Of Ujian
 }

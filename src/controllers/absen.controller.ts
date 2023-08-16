@@ -4,7 +4,7 @@ import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 
 import { prisma } from "../config/database"
-
+import jwt from "jsonwebtoken"
 
 
 export class AbsenController {
@@ -180,6 +180,63 @@ export class AbsenController {
     }
 
   }
+
+  public async absenGuru(req: Request, res: Response) {
+    const date = new Date();
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    const time = `${hours}:${minutes}`;
+    try {
+      jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (err: any, decode: any) {
+        if (err) {
+          const status = StatusCode.UNAUTHORIZED
+          return failedResponse(res, true, "Something Went Wrong", status)
+
+        } else {
+          if (decode.data.role === 2) {
+            let getLatestAbsen = await prisma.absen_guru.findFirst({
+              where: {
+                day: new Date().getDate(),
+                AND: [{
+                  month: new Date().getMonth() + 1,
+                  user_id: decode.data.id
+                }]
+              }
+            })
+            if (getLatestAbsen?.day === new Date().getDate() && getLatestAbsen?.month === new Date().getMonth() + 1) {
+              const status = StatusCode.BAD_REQUEST
+              return failedResponse(res, true, "Already Attend", status)
+            }
+            await prisma.absen_guru.create({
+              data: {
+                day: new Date().getDate(),
+                month: new Date().getMonth() + 1,
+                time: time,
+                user_id: decode.data.id,
+                keterangan: req.body.keterangan,
+                year: new Date().getFullYear(),
+                sakit_keterangan: req.body.sakit_ket
+              }
+            }).then(() => {
+              const successRes = StatusCode.CREATED
+              return successResponseOnlyMessage(res, "Successfully Absen", successRes)
+            })
+          } else {
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, "Anda Bukanlah Guru", status)
+          }
+        }
+      })
+    } catch (e) {
+      const errorStatus = StatusCode.BAD_REQUEST
+      return failedResponse(res, true, "Something Went Wrong", errorStatus)
+
+    }
+
+  }
+
 
 }
 
