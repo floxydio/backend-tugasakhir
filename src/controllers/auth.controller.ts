@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { prisma } from "../config/database"
 import { Request, Response, NextFunction } from "express";
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
+import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken, successResponseOnlyMessageTokenRole } from '../config/success_res';
 import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import dotenv from "dotenv"
@@ -63,7 +63,7 @@ export class AuthController {
               }
             })
             const successLogin = StatusCode.SUCCESS
-            return successResponseOnlyMessageToken(res, token, "Berhasil Login", successLogin)
+            return successResponseOnlyMessageTokenRole(res, token, result[0].status_role, "Berhasil Login", successLogin)
           }
         }
       }

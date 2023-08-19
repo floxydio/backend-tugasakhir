@@ -25,6 +25,15 @@ export const successResponseOnlyMessageToken = (res: Response, token: string, me
     })
 }
 
+export const successResponseOnlyMessageTokenRole = (res: Response, token: string, role: number, message: string, status: number) => {
+    return res.status(status).json({
+        status,
+        token,
+        role,
+        message,
+    })
+}
+
 
 export const successResponseOnlyMessage = (res: Response, message: string, status: number) => {
     return res.status(status).json({

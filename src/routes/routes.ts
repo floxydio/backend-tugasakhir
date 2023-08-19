@@ -43,7 +43,7 @@ const upload = multer({
 
 export default function Routes(app: Express) {
   app.get("/", function (req, res) {
-    res.send("Api Running  🚀\n\n\nAsk Dio if have question");
+    res.send("Api Running  🚀");
   });
 
   // Middleware
@@ -106,6 +106,7 @@ export default function Routes(app: Express) {
 
   // Nilai
   app.get("/v2/nilai", nilaiController.fetchDataNilai)
+
   app.get("/v2/nilai-all", nilaiController.fetchAllData)
   app.post("/v2/create-nilai", nilaiController.createNilai)
 
