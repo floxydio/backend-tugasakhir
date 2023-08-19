@@ -25,6 +25,7 @@ interface SoalGet {
     keterangan: string;
     status_ujian: number;
     total_soal: number;
+    kelas_id: number;
     createdAt: Date;
 }
 
@@ -58,6 +59,7 @@ export class UjianController {
                 tanggal: new Date().toISOString(),
                 keterangan: "ABC",
                 total_soal: 50,
+                kelas_id: 1,
                 createdAt: new Date().toISOString(),
                 soal: JSON.stringify({ pilihan_ganda: soal, essay: essay })
             }
@@ -71,7 +73,11 @@ export class UjianController {
 
 
     public async getUjian(req: Request, res: Response) {
-        const data = await prisma.ujian.findMany()
+        const data = await prisma.ujian.findMany({
+            where: {
+                kelas_id: Number(req.params.id)
+            }
+        })
         const newData: SoalGet[] = []
         const jsonSoal: DataSoal[] = []
         for (let i = 0; i < data.length; i++) {
@@ -86,10 +92,28 @@ export class UjianController {
                 mata_pelajaran: data[i].mata_pelajaran,
                 status_ujian: data[i].status_ujian,
                 tanggal: data[i].tanggal,
+                kelas_id: data[i].kelas_id,
                 total_soal: data[i].total_soal
             }
             newData.push(soalFromData)
         }
+
+        return successResponse(res, {
+            data_ujian: newData,
+
+        }, "Success Get Ujian", 200)
+    }
+
+    public async getDetailById(req: Request, res: Response) {
+        const data = await prisma.ujian.findFirst({
+            where: {
+                id: Number(req.params.id)
+            }
+        })
+        const jsonSoal: DataSoal[] = []
+        jsonSoal.push(JSON.parse(data!.soal))
+
+
         const pgData: PilihanGanda[] = []
         const essayData: Essay[] = []
         const loopPg: PilihanGanda = {
@@ -103,12 +127,11 @@ export class UjianController {
         pgData.push(loopPg)
         essayData.push(loopEssay)
         return successResponse(res, {
-            data_ujian: newData,
             soal: {
                 pilihan_ganda: pgData,
                 essay: essayData
             }
-        }, "Empty", 200)
+        }, "Success get detail by id", 200)
     }
 
 }

@@ -112,6 +112,7 @@ model ujian {
   keterangan     String   @db.VarChar(255)
   status_ujian   Int      @default(0)
   total_soal     Int
+  kelas_id       Int
   createdAt      DateTime @db.Date
 }
 
