@@ -126,3 +126,11 @@ model absen_guru {
   keterangan       String  @db.VarChar(255)
   sakit_keterangan String? @db.VarChar(255)
 }
+
+model jawaban_user {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  jawaban     String   @db.Text
+  ujian_id    Int
+  submittedAt DateTime @db.DateTime(0)
+}

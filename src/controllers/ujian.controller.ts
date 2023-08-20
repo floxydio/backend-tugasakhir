@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
 import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
-
+import jwt from 'jsonwebtoken'
 import { prisma } from "../config/database"
 
 interface SoalPilihanGanda {
@@ -132,6 +132,32 @@ export class UjianController {
                 essay: essayData
             }
         }, "Success get detail by id", 200)
+    }
+
+    public async createSubmittedExam(req: Request, res: Response) {
+        jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
+            if (error) {
+                const status = StatusCode.BAD_REQUEST
+                return failedResponse(res, true, `Something Went Wrong ${error}`, status)
+            } else {
+                const { jawaban } = req.body
+                await prisma.jawaban_user.create({
+                    data: {
+                        jawaban: JSON.stringify(jawaban),
+                        submittedAt: new Date().toISOString(),
+                        ujian_id: Number(req.params.idujian),
+                        user_id: decoded.data.id
+                    }
+                }).then(() => {
+                    const status = StatusCode.CREATED
+                    return successResponseOnlyMessage(res, "Successfully Submit", status)
+                }).catch((e) => {
+                    const status = StatusCode.BAD_REQUEST
+                    return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+                })
+            }
+
+        })
     }
 
 }
