@@ -9,6 +9,7 @@ interface SoalPilihanGanda {
     soal: string;
     pilihan: string[];
     jawaban: string;
+    isi_pilihan: string[],
 }
 
 interface SoalEssay {
@@ -38,13 +39,18 @@ interface PilihanGanda {
     soal: string;
     pilihan: string[],
     jawaban: string
+    isi_pilihan: string[],
+
 }
 
 interface Essay {
     soal: string;
 
 }
-
+interface Jawaban {
+    pg: string[],
+    essay: string[]
+}
 export class UjianController {
     public async createUjian(req: Request, res: Response) {
         const soal: SoalPilihanGanda[] = req.body.pilihan_ganda;
@@ -64,10 +70,7 @@ export class UjianController {
                 soal: JSON.stringify({ pilihan_ganda: soal, essay: essay })
             }
         }).then(() => {
-            return successResponse(res, {
-                pilihan_ganda: soal,
-                essay: essay
-            }, "Empty", 200)
+            return successResponseOnlyMessage(res, "Successfully Created", 201)
         })
     }
 
@@ -113,23 +116,32 @@ export class UjianController {
         const jsonSoal: DataSoal[] = []
         jsonSoal.push(JSON.parse(data!.soal))
 
-
         const pgData: PilihanGanda[] = []
         const essayData: Essay[] = []
-        const loopPg: PilihanGanda = {
-            soal: jsonSoal[0].pilihan_ganda[0].soal,
-            pilihan: jsonSoal[0].pilihan_ganda[0].pilihan.toString().replace(/\[|\]/g, "").split(","),
-            jawaban: jsonSoal[0].pilihan_ganda[0].jawaban
+        for (let i = 0; i < jsonSoal[0].pilihan_ganda.length; i++) {
+            const loopPg: PilihanGanda = {
+                soal: jsonSoal[0].pilihan_ganda[i].soal,
+                pilihan: jsonSoal[0].pilihan_ganda[i].pilihan.toString().replace(/\[|\]/g, "").split(","),
+                jawaban: jsonSoal[0].pilihan_ganda[i].jawaban,
+                isi_pilihan: jsonSoal[0].pilihan_ganda[i].isi_pilihan.toString().replace(/\[|\]/g, "").split(",")
+            }
+            pgData.push(loopPg)
         }
-        const loopEssay: Essay = {
-            soal: jsonSoal[0].essay[0].soal
+        if (jsonSoal[0].essay !== undefined) {
+            for (let i = 0; i < jsonSoal[0].essay.length; i++) {
+
+                const loopEssay: Essay = {
+                    soal: jsonSoal[0].essay[0].soal
+                }
+
+                essayData.push(loopEssay)
+            }
         }
-        pgData.push(loopPg)
-        essayData.push(loopEssay)
+
         return successResponse(res, {
             soal: {
                 pilihan_ganda: pgData,
-                essay: essayData
+                // essay: essayData
             }
         }, "Success get detail by id", 200)
     }
@@ -158,6 +170,64 @@ export class UjianController {
             }
 
         })
+    }
+
+
+    public async getResultExam(req: Request, res: Response) {
+        let countExam = 0
+        let countWrong = 0
+        try {
+            const data = await prisma.ujian.findFirst({
+                where: {
+                    id: Number(req.params.idujian)
+                }
+            })
+
+            const dataAnswer = await prisma.jawaban_user.findFirst({
+                where: {
+                    ujian_id: Number(req.params.idujian)
+                }
+            })
+            const jsonAnswer: Jawaban[] = []
+            const jsonSoal: DataSoal[] = []
+            jsonSoal.push(JSON.parse(data!.soal))
+            jsonAnswer.push(JSON.parse(dataAnswer!.jawaban))
+
+            const pgData: PilihanGanda[] = []
+
+            for (let i = 0; i < jsonSoal[0].pilihan_ganda.length; i++) {
+                const loopPg: PilihanGanda = {
+                    soal: jsonSoal[0].pilihan_ganda[i].soal,
+                    pilihan: jsonSoal[0].pilihan_ganda[i].pilihan.toString().replace(/\[|\]/g, "").split(","),
+                    jawaban: jsonSoal[0].pilihan_ganda[i].jawaban,
+                    isi_pilihan: jsonSoal[0].pilihan_ganda[i].isi_pilihan.toString().replace(/\[|\]/g, "").split(",")
+                }
+                pgData.push(loopPg)
+            }
+
+            const loopJawaban: Jawaban = {
+                pg: jsonAnswer[0].pg,
+                essay: []
+            }
+            for (let i = 0; i < pgData.length; i++) {
+                if (pgData[i].jawaban === loopJawaban.pg[i]) {
+
+                    countExam++
+                } else if (pgData[i].jawaban !== loopJawaban.pg[i]) {
+                    countWrong++
+                }
+            }
+            const status = StatusCode.SUCCESS
+            return successResponse(res, {
+                jumlah_benar_pg: countExam,
+                jumlah_salah_pg: countWrong,
+                total_soal_pg: pgData.length
+            }, "Get Increment Nilai", status)
+
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
     }
 
 }
