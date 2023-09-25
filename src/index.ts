@@ -5,15 +5,23 @@ import bodyParser from 'body-parser';
 import cors from "cors";
 import helmet from "helmet"
 import compression from "compression"
+import { rateLimit } from "express-rate-limit"
 
 export const app: Express = express()
 
 dotenv.config()
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 500,
+  legacyHeaders: false
+})
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet())
 app.use(compression())
+app.use(limiter)
 
 
 Routes(app);

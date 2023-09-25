@@ -134,3 +134,11 @@ model jawaban_user {
   ujian_id    Int
   submittedAt DateTime @db.DateTime(0)
 }
+
+model log_ujian {
+  id           Int      @id @default(autoincrement())
+  ujian_data   String   @db.VarChar(255)
+  soal_jawaban String   @db.Text
+  user_id      Int
+  createdAt    DateTime @db.Date
+}
