@@ -115,6 +115,7 @@ export default function Routes(app: Express) {
   //End Of Kelas
 
   // Ujian
+  app.get("/v2/all-ujian", ujianController.getAllUjian)
   app.post("/v2/create-ujian", ujianController.createUjian)
   app.get("/v2/ujian/:id", ujianController.getUjian)
   app.get("/v2/ujian-detail/:id", ujianController.getDetailById)

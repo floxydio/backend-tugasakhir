@@ -6,6 +6,8 @@ import cors from "cors";
 import helmet from "helmet"
 import compression from "compression"
 import { rateLimit } from "express-rate-limit"
+import { PrismaClient } from '@prisma/client';
+
 
 export const app: Express = express()
 
@@ -16,6 +18,7 @@ const limiter = rateLimit({
   limit: 500,
   legacyHeaders: false
 })
+const prisma = new PrismaClient()
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
@@ -27,5 +30,11 @@ app.use(limiter)
 Routes(app);
 
 app.listen(process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW, () => {
+  prisma.$connect().then(() => {
+    console.log("Database Connected");
+  }).catch((err) => {
+    console.log("Database Connection Failed");
+    console.log(err);
+  })
   console.log(`Server Running on -> ${process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW} || ${process.env.NODE_ENV === "development" ? "Development" : "Production"} Mode`);
 });

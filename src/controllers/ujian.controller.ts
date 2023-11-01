@@ -74,6 +74,18 @@ export class UjianController {
         })
     }
 
+    public async getAllUjian(req: Request, res: Response) {
+        try {
+            const data = await prisma.$queryRaw`SELECT ujian.id, ujian.nama_ujian, ujian.tanggal, pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
+        `
+            return successResponse(res, {
+                data_ujian: data
+            }, "Success Get All Ujian", 200)
+        } catch (e) {
+            return failedResponse(res, true, `Something Went Wrong:${e}`, 400)
+        }
+    }
+
 
     public async getUjian(req: Request, res: Response) {
         const data = await prisma.ujian.findMany({
