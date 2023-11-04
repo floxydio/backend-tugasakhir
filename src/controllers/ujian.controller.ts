@@ -5,17 +5,6 @@ import StatusCode from '../config/status_code';
 import jwt from 'jsonwebtoken'
 import { prisma } from "../config/database"
 
-interface SoalPilihanGanda {
-    soal: string;
-    pilihan: string[];
-    jawaban: string;
-    isi_pilihan: string[],
-}
-
-interface SoalEssay {
-    soal: string;
-}
-
 interface SoalGet {
     id: number;
     nama_ujian: string;
@@ -151,7 +140,7 @@ export class UjianController {
                         submittedAt: new Date().toISOString(),
                         total_benar: 0,
                         total_salah: 0,
-                        ujian_id: Number(req.params.idujian),
+                        ujian_id: Number(req.body.idujian),
                         user_id: decoded.data.id
                     }
                 }).then(() => {
@@ -165,67 +154,8 @@ export class UjianController {
 
         })
     }
-
-
-    // public async getResultExam(req: Request, res: Response) {
-    //     let countExam = 0
-    //     let countWrong = 0
-    //     try {
-    //         const data = await prisma.ujian.findFirst({
-    //             where: {
-    //                 id: Number(req.params.idujian)
-    //             }
-    //         })
-
-    //         const dataAnswer = await prisma.jawaban_user.findFirst({
-    //             where: {
-    //                 ujian_id: Number(req.params.idujian)
-    //             }
-    //         })
-    //         const jsonAnswer: Jawaban[] = []
-    //         const jsonSoal: DataSoal[] = []
-    //         jsonSoal.push(JSON.parse(data!.soal))
-    //         jsonAnswer.push(JSON.parse(dataAnswer!.jawaban))
-
-    //         const pgData: PilihanGanda[] = []
-
-    //         for (let i = 0; i < jsonSoal[0].pilihan_ganda.length; i++) {
-    //             const loopPg: PilihanGanda = {
-    //                 soal: jsonSoal[0].pilihan_ganda[i].soal,
-    //                 pilihan: jsonSoal[0].pilihan_ganda[i].pilihan.toString().replace(/\[|\]/g, "").split(","),
-    //                 jawaban: jsonSoal[0].pilihan_ganda[i].jawaban,
-    //                 isi_pilihan: jsonSoal[0].pilihan_ganda[i].isi_pilihan.toString().replace(/\[|\]/g, "").split(",")
-    //             }
-    //             pgData.push(loopPg)
-    //         }
-
-    //         const loopJawaban: Jawaban = {
-    //             pg: jsonAnswer[0].pg,
-    //             essay: []
-    //         }
-    //         for (let i = 0; i < pgData.length; i++) {
-    //             if (pgData[i].jawaban === loopJawaban.pg[i]) {
-
-    //                 countExam++
-    //             } else if (pgData[i].jawaban !== loopJawaban.pg[i]) {
-    //                 countWrong++
-    //             }
-    //         }
-    //         const status = StatusCode.SUCCESS
-    //         return successResponse(res, {
-    //             jumlah_benar_pg: countExam,
-    //             jumlah_salah_pg: countWrong,
-    //             total_soal_pg: pgData.length
-    //         }, "Get Increment Nilai", status)
-
-    //     } catch (e) {
-    //         const errorStatus = StatusCode.BAD_REQUEST
-    //         return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
-    //     }
-    // }
-
     public async getResultExam(req: Request, res: Response) {
-        if (req.params.iduser === undefined || req.params.idujian === undefined) {
+        if (req.query.iduser === undefined || req.params.idujian === undefined) {
             return failedResponse(res, true, `ID Ujian atau ID User Dibutuhkan`, 400)
         }
 
@@ -244,7 +174,7 @@ export class UjianController {
             })
             let dataJawaban = await prisma.jawaban_user.findFirst({
                 where: {
-                    user_id: Number(req.params.iduser),
+                    user_id: Number(req.query.iduser),
                     ujian_id: Number(req.params.idujian)
                 }
             })
@@ -270,6 +200,17 @@ export class UjianController {
                     countExamRight++
                 }
             }
+
+            await prisma.jawaban_user.update({
+                where: {
+                    id: dataJawaban?.id,
+                    user_id: Number(req.query.iduser),
+                },
+                data: {
+                    total_benar: countExamRight,
+                    total_salah: soalPilihanGanda.length - countExamRight
+                }
+            })
 
             return res.status(200).json({
                 message: "Success dapat hasil",
