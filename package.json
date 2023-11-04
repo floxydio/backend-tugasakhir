@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "dev-js": "nodemon --exitcrash dist/index.js",
-    "dev-prod": "tsc --build"
+    "dev-prod": "tsc --build",
+    "generate": "npx prisma db pull && npx prisma generate"
   },
   "keywords": [],
   "author": "Dio Okta R",

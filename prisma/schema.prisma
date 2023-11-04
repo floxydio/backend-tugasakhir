@@ -108,6 +108,7 @@ model ujian {
   mata_pelajaran Int
   durasi         Int
   soal           String   @db.Text
+  essay          String   @db.Text
   jam_mulai      String   @db.VarChar(255)
   keterangan     String   @db.VarChar(255)
   status_ujian   Int      @default(0)
@@ -128,11 +129,14 @@ model absen_guru {
 }
 
 model jawaban_user {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  jawaban     String   @db.Text
-  ujian_id    Int
-  submittedAt DateTime @db.DateTime(0)
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  jawaban_pg    String?  @db.Text
+  jawaban_essay String?  @db.Text
+  ujian_id      Int
+  total_benar   Int
+  total_salah   Int
+  submittedAt   DateTime @db.DateTime(0)
 }
 
 model log_ujian {
