@@ -136,6 +136,7 @@ model jawaban_user {
   ujian_id      Int
   total_benar   Int
   total_salah   Int
+  log_history   String?  @db.Text
   submittedAt   DateTime @db.DateTime(0)
 }
 

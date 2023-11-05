@@ -4,38 +4,9 @@ import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import jwt from 'jsonwebtoken'
 import { prisma } from "../config/database"
+import { DataSoal, Essay, PilihanGanda, SoalGet } from "../models/ujian.dto";
 
-interface SoalGet {
-    id: number;
-    nama_ujian: string;
-    tanggal: Date;
-    mata_pelajaran: number;
-    durasi: number;
-    jam_mulai: string;
-    keterangan: string;
-    status_ujian: number;
-    total_soal: number;
-    kelas_id: number;
-    createdAt: Date;
-}
 
-interface PilihanGanda {
-    id_soal: string
-    soal: string
-    pilihan: string[][]
-    jawaban: string
-}
-
-interface Essay {
-    id_soal: string
-    soal: string
-    jawaban: string
-}
-
-interface DataSoal {
-    pilihan_ganda: PilihanGanda[]
-    essay: Essay[]
-}
 export class UjianController {
     public async createUjian(req: Request, res: Response) {
 
@@ -120,19 +91,24 @@ export class UjianController {
             console.error("Failed to parse 'soal' or 'essay' JSON data", error);
         };
         return res.status(200).json({
-            message: "Success get detail by id",
+            message: "Success get ujian detail by id",
             soal: soal,
             essay: essay
         });
     }
 
     public async createSubmittedExam(req: Request, res: Response) {
+        if (req.body.token === undefined) {
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Token is Required`, status)
+        }
+
         jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
             if (error) {
                 const status = StatusCode.BAD_REQUEST
                 return failedResponse(res, true, `Something Went Wrong ${error}`, status)
             } else {
-                const { jawaban_pg, jawaban_essay } = req.body
+                const { jawaban_pg, jawaban_essay, log } = req.body
                 await prisma.jawaban_user.create({
                     data: {
                         jawaban_pg: JSON.stringify(jawaban_pg),
@@ -141,7 +117,8 @@ export class UjianController {
                         total_benar: 0,
                         total_salah: 0,
                         ujian_id: Number(req.body.idujian),
-                        user_id: decoded.data.id
+                        user_id: decoded.data.id,
+                        log_history: JSON.stringify(log)
                     }
                 }).then(() => {
                     const status = StatusCode.CREATED
@@ -227,6 +204,46 @@ export class UjianController {
             const status = StatusCode.BAD_REQUEST
             return failedResponse(res, true, `Something Went Wrong ${e}`, status)
         }
+    }
+
+
+
+    public async checkUserAlreadyExam(req: Request, res: Response) {
+        if (req.query.token === undefined) {
+            return failedResponse(res, true, `Token is Required`, 400)
+        }
+
+        jwt.verify(req.query.token as string, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
+            if (error) {
+                return failedResponse(res, true, `Something Went Wrong ${error}`, 400)
+            }
+            try {
+                const data = await prisma.jawaban_user.findFirst({
+                    where: {
+                        user_id: Number(decoded.data.id),
+                        ujian_id: Number(req.params.idujian)
+                    }
+                })
+
+                // True -> Already Exam, False -> Not Yet Exam
+                if (data === null) {
+                    return res.status(200).json({
+                        message: "Succesfully Check Exam",
+                        status: false
+                    })
+                } else {
+                    return res.status(200).json({
+                        message: "Succesfully Check Exam",
+                        status: true
+                    })
+
+                }
+            } catch (e) {
+                const status = StatusCode.BAD_REQUEST
+                return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+            }
+        })
+
     }
 
 }

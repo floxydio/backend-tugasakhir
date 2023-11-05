@@ -1,6 +1,6 @@
 {
   "name": "express-ta",
-  "version": "1.0.8-beta",
+  "version": "1.5.3-beta",
   "description": "",
   "main": "index.js",
   "scripts": {
