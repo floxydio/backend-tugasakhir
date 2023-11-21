@@ -14,15 +14,15 @@ export class UjianController {
             data: {
                 nama_ujian: req.body.nama_ujian,
                 durasi: Number(req.body.durasi),
-                jam_mulai: "05:40",
-                mata_pelajaran: 1,
+                jam_mulai: req.body.jam,
+                mata_pelajaran: Number(req.body.mapel),
                 tanggal: new Date().toISOString(),
-                keterangan: "ABC",
+                keterangan: req.body.keterangan ?? "",
                 total_soal: Number(req.body.total_soal),
                 kelas_id: 1,
                 createdAt: new Date().toISOString(),
                 soal: JSON.stringify(req.body.soal),
-                essay: JSON.stringify(req.body.essay),
+                essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
 
             }
         }).then(() => {
@@ -206,8 +206,6 @@ export class UjianController {
         }
     }
 
-
-
     public async checkUserAlreadyExam(req: Request, res: Response) {
         if (req.query.token === undefined) {
             return failedResponse(res, true, `Token is Required`, 400)
@@ -246,4 +244,33 @@ export class UjianController {
 
     }
 
+    public async editPilihanGandaAndEssay(req: Request, res: Response) {
+        if (req.body.token === undefined) {
+            return failedResponse(res, true, `Token is Required`, 400)
+        }
+
+        jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
+            if (error) {
+                return failedResponse(res, true, `Something Went Wrong ${error}`, 400)
+            }
+            try {
+                const data = await prisma.jawaban_user.update({
+                    where: {
+                        id: Number(req.params.id),
+                    },
+                    data: {
+                        jawaban_pg: JSON.stringify(req.body.jawaban_pg),
+                        jawaban_essay: JSON.stringify(req.body.jawaban_essay)
+                    }
+                })
+                return res.status(200).json({
+                    message: "Succesfully Edit Jawaban",
+                    data: data
+                })
+            } catch (e) {
+                const status = StatusCode.BAD_REQUEST
+                return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+            }
+        })
+    }
 }

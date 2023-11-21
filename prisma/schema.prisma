@@ -107,8 +107,8 @@ model ujian {
   tanggal        DateTime @db.Date
   mata_pelajaran Int
   durasi         Int
-  soal           String   @db.Text
-  essay          String   @db.Text
+  soal           String   @db.LongText
+  essay          String   @db.LongText
   jam_mulai      String   @db.VarChar(255)
   keterangan     String   @db.VarChar(255)
   status_ujian   Int      @default(0)

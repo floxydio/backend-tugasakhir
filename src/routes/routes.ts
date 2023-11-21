@@ -10,6 +10,7 @@ import multer from "multer"
 import { v4 as uuidv4 } from 'uuid';
 import path from "path"
 import { UjianController } from '../controllers/ujian.controller';
+import { UserAnswerController } from '../controllers/user_answer.controller';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -57,6 +58,7 @@ export default function Routes(app: Express) {
   const pelajaranController = new PelajaranController()
   const absenController = new AbsenController()
   const ujianController = new UjianController()
+  const userAnswerController = new UserAnswerController()
 
   // Static
   app.use("/img-profile", express.static("src/storage/profile"))
@@ -122,6 +124,9 @@ export default function Routes(app: Express) {
   app.post("/v2/ujian-submitted", ujianController.createSubmittedExam)
   app.get("/v2/ujian-result/:idujian", ujianController.getResultExam)
   app.get("/v2/check-exam/:idujian", ujianController.checkUserAlreadyExam)
+
+  // Jawaban User
+  app.get("/v2/all-exam", userAnswerController.getAnswerUser)
 
 
   // app.get("/v2/", )  

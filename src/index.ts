@@ -21,13 +21,13 @@ const limiter = rateLimit({
 const prisma = new PrismaClient()
 
 
-app.use((req, res, next) => {
-  res.status(404).json({
-    message: 'Ohh you are lost, read the API documentation to find your way back home xD'
-  })
-})
+// app.use((req, res, next) => {
+//   res.status(404).json({
+//     message: 'Ohh you are lost, read the API documentation to find your way back home xD'
+//   })
+// })
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 50000 }));
 app.use(cors());
 app.use(helmet())
 app.use(compression())
