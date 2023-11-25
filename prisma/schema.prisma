@@ -74,13 +74,14 @@ model nilai {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pelajaran {
-  id        Int      @id @default(autoincrement())
-  nama      String   @db.VarChar(255)
+  id        Int       @id @default(autoincrement())
+  nama      String    @db.VarChar(255)
   guru_id   Int
   kelas_id  Int
   jadwal    Int
-  jam       String   @db.VarChar(255)
-  createdAt DateTime @db.Date
+  jam       String    @db.VarChar(255)
+  createdAt DateTime  @db.Date
+  updatedAt DateTime? @db.Date
 }
 
 model users {
@@ -102,19 +103,20 @@ model todo {
 }
 
 model ujian {
-  id             Int      @id @default(autoincrement())
-  nama_ujian     String   @db.VarChar(255)
-  tanggal        DateTime @db.Date
+  id             Int       @id @default(autoincrement())
+  nama_ujian     String    @db.VarChar(255)
+  tanggal        DateTime  @db.Date
   mata_pelajaran Int
   durasi         Int
-  soal           String   @db.LongText
-  essay          String   @db.LongText
-  jam_mulai      String   @db.VarChar(255)
-  keterangan     String   @db.VarChar(255)
-  status_ujian   Int      @default(0)
+  soal           String    @db.LongText
+  essay          String    @db.LongText
+  jam_mulai      String    @db.VarChar(255)
+  keterangan     String    @db.VarChar(255)
+  status_ujian   Int       @default(0)
   total_soal     Int
   kelas_id       Int
-  createdAt      DateTime @db.Date
+  createdAt      DateTime  @db.Date
+  updatedAt      DateTime? @db.Date
 }
 
 model absen_guru {

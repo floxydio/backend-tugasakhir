@@ -124,6 +124,7 @@ export default function Routes(app: Express) {
   app.post("/v2/ujian-submitted", ujianController.createSubmittedExam)
   app.get("/v2/ujian-result/:idujian", ujianController.getResultExam)
   app.get("/v2/check-exam/:idujian", ujianController.checkUserAlreadyExam)
+  app.put("/v2/edit-ujian/:id", ujianController.updateUjian)
 
   // Jawaban User
   app.get("/v2/all-exam", userAnswerController.getAnswerUser)

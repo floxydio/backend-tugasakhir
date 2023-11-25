@@ -16,7 +16,7 @@ export class UjianController {
                 durasi: Number(req.body.durasi),
                 jam_mulai: req.body.jam,
                 mata_pelajaran: Number(req.body.mapel),
-                tanggal: new Date().toISOString(),
+                tanggal: req.body.tanggal,
                 keterangan: req.body.keterangan ?? "",
                 total_soal: Number(req.body.total_soal),
                 kelas_id: 1,
@@ -27,13 +27,44 @@ export class UjianController {
             }
         }).then(() => {
             return successResponseOnlyMessage(res, "Successfully Created", 201)
+        }).catch((err) => {
+            return failedResponse(res, true, `Something Went Wrong ${err}`, 400)
+
+        })
+    }
+
+    public async updateUjian(req: Request, res: Response) {
+        const { id } = req.params
+        await prisma.ujian.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                nama_ujian: req.body.nama_ujian,
+                durasi: Number(req.body.durasi),
+                jam_mulai: req.body.jam,
+                mata_pelajaran: Number(req.body.mapel),
+                tanggal: req.body.tanggal,
+                keterangan: req.body.keterangan ?? "",
+                total_soal: Number(req.body.total_soal),
+                kelas_id: 1,
+                soal: JSON.stringify(req.body.soal),
+                essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
+                updatedAt: new Date().toISOString()
+
+            }
+        }).then(() => {
+            return successResponseOnlyMessage(res, "Successfully Updated", 201)
+        }).catch((err) => {
+            return failedResponse(res, true, `Something Went Wrong ${err}`, 400)
+
         })
     }
 
 
     public async getAllUjian(req: Request, res: Response) {
         try {
-            const data = await prisma.$queryRaw`SELECT ujian.id,ujian.kelas_id, ujian.nama_ujian, ujian.tanggal, pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
+            const data = await prisma.$queryRaw`SELECT ujian.id,ujian.durasi,ujian.kelas_id, ujian.nama_ujian, ujian.tanggal, pelajaran.id as pelajaran_id ,pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
         `
             return successResponse(res, data, "Success Get All Ujian", 200)
         } catch (e) {
