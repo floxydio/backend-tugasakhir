@@ -35,7 +35,7 @@ export class PelajaranController {
 
   public async findPelajaran(req: Request, res: Response) {
     try {
-      await prisma.pelajaran.findMany().then((p) => {
+      await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor, pelajaran.jam FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
         const successRes = StatusCode.SUCCESS
         return successResponse(res, p, "Successfully GET Pelajaran", successRes)
       })

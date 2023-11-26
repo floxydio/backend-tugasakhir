@@ -64,6 +64,10 @@ export class AuthController {
             })
             const successLogin = StatusCode.SUCCESS
             return successResponseOnlyMessageTokenRole(res, token, result[0].status_role, "Berhasil Login", successLogin)
+          } else {
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, "Password Salah", status)
+
           }
         }
       }

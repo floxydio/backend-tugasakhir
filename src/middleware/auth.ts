@@ -19,10 +19,12 @@ export class middlewareAuth {
         return res.status(401).json({
           message: 'User Unauthorized',
         });
+      } else {
+
+        next();
       }
     });
 
-    next();
   }
 
 

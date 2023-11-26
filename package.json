@@ -1,27 +1,29 @@
 {
   "name": "express-ta",
-  "version": "1.0.8-beta",
+  "version": "1.5.3-beta",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev-ts": "nodemon src/index.ts",
+    "dev": "nodemon src/index.ts",
     "dev-js": "nodemon --exitcrash dist/index.js",
-    "dev-prod": "tsc --build"
+    "dev-prod": "tsc --build",
+    "generate": "npx prisma db pull && npx prisma generate"
   },
   "keywords": [],
   "author": "Dio Okta R",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.1.1",
+    "@prisma/client": "^5.5.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-rate-limit": "^7.0.1",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^1.4.5-lts.1", 
     "mysql2": "^3.2.0",
     "nodemon": "^2.0.22",
     "uuid": "^9.0.0"
@@ -38,7 +40,7 @@
     "@types/node": "^20.4.9",
     "@types/uuid": "^9.0.2",
     "eslint": "^8.37.0",
-    "prisma": "^5.1.1",
-    "typescript": "^5.1.6"
+    "prisma": "^5.5.0",
+    "typescript": "^5.2.2"
   }
 }

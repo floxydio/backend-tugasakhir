@@ -4,74 +4,72 @@ import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import jwt from 'jsonwebtoken'
 import { prisma } from "../config/database"
+import { DataSoal, Essay, PilihanGanda, SoalGet } from "../models/ujian.dto";
 
-interface SoalPilihanGanda {
-    soal: string;
-    pilihan: string[];
-    jawaban: string;
-    isi_pilihan: string[],
-}
 
-interface SoalEssay {
-    soal: string;
-}
-
-interface SoalGet {
-    id: number;
-    nama_ujian: string;
-    tanggal: Date;
-    mata_pelajaran: number;
-    durasi: number;
-    jam_mulai: string;
-    keterangan: string;
-    status_ujian: number;
-    total_soal: number;
-    kelas_id: number;
-    createdAt: Date;
-}
-
-interface DataSoal {
-    pilihan_ganda: PilihanGanda[]
-    essay: Essay[]
-}
-
-interface PilihanGanda {
-    soal: string;
-    pilihan: string[],
-    jawaban: string
-    isi_pilihan: string[],
-
-}
-
-interface Essay {
-    soal: string;
-
-}
-interface Jawaban {
-    pg: string[],
-    essay: string[]
-}
 export class UjianController {
     public async createUjian(req: Request, res: Response) {
-        const soal: SoalPilihanGanda[] = req.body.pilihan_ganda;
-        const essay: SoalEssay[] = req.body.essay
 
         await prisma.ujian.create({
             data: {
-                nama_ujian: "Ujian Tengah Semester",
-                durasi: 60,
-                jam_mulai: "05:40",
-                mata_pelajaran: 1,
-                tanggal: new Date().toISOString(),
-                keterangan: "ABC",
-                total_soal: 50,
+                nama_ujian: req.body.nama_ujian,
+                durasi: Number(req.body.durasi),
+                jam_mulai: req.body.jam,
+                mata_pelajaran: Number(req.body.mapel),
+                tanggal: req.body.tanggal,
+                keterangan: req.body.keterangan ?? "",
+                total_soal: Number(req.body.total_soal),
                 kelas_id: 1,
                 createdAt: new Date().toISOString(),
-                soal: JSON.stringify({ pilihan_ganda: soal, essay: essay })
+                soal: JSON.stringify(req.body.soal),
+                essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
+
             }
         }).then(() => {
             return successResponseOnlyMessage(res, "Successfully Created", 201)
+        }).catch((err) => {
+            return failedResponse(res, true, `Something Went Wrong ${err}`, 400)
+
         })
+    }
+
+    public async updateUjian(req: Request, res: Response) {
+        const { id } = req.params
+        await prisma.ujian.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                nama_ujian: req.body.nama_ujian,
+                durasi: Number(req.body.durasi),
+                jam_mulai: req.body.jam,
+                mata_pelajaran: Number(req.body.mapel),
+                tanggal: req.body.tanggal,
+                keterangan: req.body.keterangan ?? "",
+                total_soal: Number(req.body.total_soal),
+                kelas_id: 1,
+                soal: JSON.stringify(req.body.soal),
+                essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
+                updatedAt: new Date().toISOString()
+
+            }
+        }).then(() => {
+            return successResponseOnlyMessage(res, "Successfully Updated", 201)
+        }).catch((err) => {
+            return failedResponse(res, true, `Something Went Wrong ${err}`, 400)
+
+        })
+    }
+
+
+    public async getAllUjian(req: Request, res: Response) {
+        try {
+            const data = await prisma.$queryRaw`SELECT ujian.id,ujian.durasi,ujian.kelas_id, ujian.nama_ujian, ujian.tanggal, pelajaran.id as pelajaran_id ,pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
+        `
+            return successResponse(res, data, "Success Get All Ujian", 200)
+        } catch (e) {
+            return failedResponse(res, true, `Something Went Wrong:${e}`, 400)
+        }
     }
 
 
@@ -113,52 +111,45 @@ export class UjianController {
                 id: Number(req.params.id)
             }
         })
-        const jsonSoal: DataSoal[] = []
-        jsonSoal.push(JSON.parse(data!.soal))
 
-        const pgData: PilihanGanda[] = []
-        const essayData: Essay[] = []
-        for (let i = 0; i < jsonSoal[0].pilihan_ganda.length; i++) {
-            const loopPg: PilihanGanda = {
-                soal: jsonSoal[0].pilihan_ganda[i].soal,
-                pilihan: jsonSoal[0].pilihan_ganda[i].pilihan.toString().replace(/\[|\]/g, "").split(","),
-                jawaban: jsonSoal[0].pilihan_ganda[i].jawaban,
-                isi_pilihan: jsonSoal[0].pilihan_ganda[i].isi_pilihan.toString().replace(/\[|\]/g, "").split(",")
-            }
-            pgData.push(loopPg)
-        }
-        if (jsonSoal[0].essay !== undefined) {
-            for (let i = 0; i < jsonSoal[0].essay.length; i++) {
+        let soal = [];
+        let essay = [];
 
-                const loopEssay: Essay = {
-                    soal: jsonSoal[0].essay[0].soal
-                }
-
-                essayData.push(loopEssay)
-            }
-        }
-
-        return successResponse(res, {
-            soal: {
-                pilihan_ganda: pgData,
-                // essay: essayData
-            }
-        }, "Success get detail by id", 200)
+        try {
+            soal = data?.soal ? JSON.parse(data.soal) : [];
+            essay = data?.essay ? JSON.parse(data.essay) : [];
+        } catch (error) {
+            console.error("Failed to parse 'soal' or 'essay' JSON data", error);
+        };
+        return res.status(200).json({
+            message: "Success get ujian detail by id",
+            soal: soal,
+            essay: essay
+        });
     }
 
     public async createSubmittedExam(req: Request, res: Response) {
+        if (req.body.token === undefined) {
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Token is Required`, status)
+        }
+
         jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
             if (error) {
                 const status = StatusCode.BAD_REQUEST
                 return failedResponse(res, true, `Something Went Wrong ${error}`, status)
             } else {
-                const { jawaban } = req.body
+                const { jawaban_pg, jawaban_essay, log } = req.body
                 await prisma.jawaban_user.create({
                     data: {
-                        jawaban: JSON.stringify(jawaban),
+                        jawaban_pg: JSON.stringify(jawaban_pg),
+                        jawaban_essay: JSON.stringify(jawaban_essay),
                         submittedAt: new Date().toISOString(),
-                        ujian_id: Number(req.params.idujian),
-                        user_id: decoded.data.id
+                        total_benar: 0,
+                        total_salah: 0,
+                        ujian_id: Number(req.body.idujian),
+                        user_id: decoded.data.id,
+                        log_history: JSON.stringify(log)
                     }
                 }).then(() => {
                     const status = StatusCode.CREATED
@@ -171,63 +162,146 @@ export class UjianController {
 
         })
     }
-
-
     public async getResultExam(req: Request, res: Response) {
-        let countExam = 0
-        let countWrong = 0
+        if (req.query.iduser === undefined || req.params.idujian === undefined) {
+            return failedResponse(res, true, `ID Ujian atau ID User Dibutuhkan`, 400)
+        }
+
+
+        let countExamRight = 0
+        let countExamWrong = 0
+
+        let countEssayRight = 0
+        let countEssayWrong = 0
+
         try {
-            const data = await prisma.ujian.findFirst({
+            let questionExam = await prisma.ujian.findFirst({
                 where: {
                     id: Number(req.params.idujian)
                 }
             })
-
-            const dataAnswer = await prisma.jawaban_user.findFirst({
+            let dataJawaban = await prisma.jawaban_user.findFirst({
                 where: {
+                    user_id: Number(req.query.iduser),
                     ujian_id: Number(req.params.idujian)
                 }
             })
-            const jsonAnswer: Jawaban[] = []
-            const jsonSoal: DataSoal[] = []
-            jsonSoal.push(JSON.parse(data!.soal))
-            jsonAnswer.push(JSON.parse(dataAnswer!.jawaban))
-
-            const pgData: PilihanGanda[] = []
-
-            for (let i = 0; i < jsonSoal[0].pilihan_ganda.length; i++) {
-                const loopPg: PilihanGanda = {
-                    soal: jsonSoal[0].pilihan_ganda[i].soal,
-                    pilihan: jsonSoal[0].pilihan_ganda[i].pilihan.toString().replace(/\[|\]/g, "").split(","),
-                    jawaban: jsonSoal[0].pilihan_ganda[i].jawaban,
-                    isi_pilihan: jsonSoal[0].pilihan_ganda[i].isi_pilihan.toString().replace(/\[|\]/g, "").split(",")
-                }
-                pgData.push(loopPg)
+            let soalPilihanGanda: PilihanGanda[] = []
+            let soalEssay: Essay[] = []
+            let jawabanPG: string[] = dataJawaban?.jawaban_pg ? JSON.parse(dataJawaban.jawaban_pg) : []
+            let jawabanEssay: string[] = dataJawaban?.jawaban_essay ? JSON.parse(dataJawaban.jawaban_essay) : []
+            if (questionExam?.soal === undefined || questionExam?.soal === "") {
+                soalPilihanGanda = []
+            }
+            else {
+                soalPilihanGanda = JSON.parse(questionExam.soal)
             }
 
-            const loopJawaban: Jawaban = {
-                pg: jsonAnswer[0].pg,
-                essay: []
+            if (questionExam?.essay === undefined || questionExam?.essay === "") {
+                soalEssay = []
+            } else {
+                soalEssay = JSON.parse(questionExam.essay)
             }
-            for (let i = 0; i < pgData.length; i++) {
-                if (pgData[i].jawaban === loopJawaban.pg[i]) {
 
-                    countExam++
-                } else if (pgData[i].jawaban !== loopJawaban.pg[i]) {
-                    countWrong++
+            for (let i = 0; i < soalPilihanGanda.length; i++) {
+                if (soalPilihanGanda[i].jawaban === jawabanPG[i]) {
+                    countExamRight++
                 }
             }
-            const status = StatusCode.SUCCESS
-            return successResponse(res, {
-                jumlah_benar_pg: countExam,
-                jumlah_salah_pg: countWrong,
-                total_soal_pg: pgData.length
-            }, "Get Increment Nilai", status)
+
+            await prisma.jawaban_user.update({
+                where: {
+                    id: dataJawaban?.id,
+                    user_id: Number(req.query.iduser),
+                },
+                data: {
+                    total_benar: countExamRight,
+                    total_salah: soalPilihanGanda.length - countExamRight
+                }
+            })
+
+            return res.status(200).json({
+                message: "Success dapat hasil",
+                data: {
+                    jumlah_benar_pg: countExamRight,
+                    jumlah_salah_pg: soalPilihanGanda.length - countExamRight,
+                    total_soal_pg: soalPilihanGanda.length
+                }
+            })
+
+
 
         } catch (e) {
-            const errorStatus = StatusCode.BAD_REQUEST
-            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong ${e}`, status)
         }
     }
 
+    public async checkUserAlreadyExam(req: Request, res: Response) {
+        if (req.query.token === undefined) {
+            return failedResponse(res, true, `Token is Required`, 400)
+        }
+
+        jwt.verify(req.query.token as string, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
+            if (error) {
+                return failedResponse(res, true, `Something Went Wrong ${error}`, 400)
+            }
+            try {
+                const data = await prisma.jawaban_user.findFirst({
+                    where: {
+                        user_id: Number(decoded.data.id),
+                        ujian_id: Number(req.params.idujian)
+                    }
+                })
+
+                // True -> Already Exam, False -> Not Yet Exam
+                if (data === null) {
+                    return res.status(200).json({
+                        message: "Succesfully Check Exam",
+                        status: false
+                    })
+                } else {
+                    return res.status(200).json({
+                        message: "Succesfully Check Exam",
+                        status: true
+                    })
+
+                }
+            } catch (e) {
+                const status = StatusCode.BAD_REQUEST
+                return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+            }
+        })
+
+    }
+
+    public async editPilihanGandaAndEssay(req: Request, res: Response) {
+        if (req.body.token === undefined) {
+            return failedResponse(res, true, `Token is Required`, 400)
+        }
+
+        jwt.verify(req.body.token, `${process.env.JWT_TOKEN_SECRET}`, async function (error: any, decoded: any) {
+            if (error) {
+                return failedResponse(res, true, `Something Went Wrong ${error}`, 400)
+            }
+            try {
+                const data = await prisma.jawaban_user.update({
+                    where: {
+                        id: Number(req.params.id),
+                    },
+                    data: {
+                        jawaban_pg: JSON.stringify(req.body.jawaban_pg),
+                        jawaban_essay: JSON.stringify(req.body.jawaban_essay)
+                    }
+                })
+                return res.status(200).json({
+                    message: "Succesfully Edit Jawaban",
+                    data: data
+                })
+            } catch (e) {
+                const status = StatusCode.BAD_REQUEST
+                return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+            }
+        })
+    }
 }
