@@ -149,3 +149,11 @@ model log_ujian {
   user_id      Int
   createdAt    DateTime @db.Date
 }
+
+model role_user {
+  id          Int    @id @default(autoincrement())
+  role_id     Int
+  menu_name   String @db.VarChar(255)
+  status_menu Int    @default(0)
+  url_path    String @db.VarChar(255)
+}

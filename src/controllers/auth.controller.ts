@@ -184,7 +184,7 @@ export class AuthController {
           status_user: Number(0),
           user_agent: req.headers["user-agent"],
           status_role: Number(0),
-          kelas_id: kelasid
+          kelas_id: kelasid ?? 0
         }
       }).then(() => {
         const successRes = StatusCode.CREATED

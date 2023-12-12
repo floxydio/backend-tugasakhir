@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path from "path"
 import { UjianController } from '../controllers/ujian.controller';
 import { UserAnswerController } from '../controllers/user_answer.controller';
+import { RoleController } from '../controllers/role.controller';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -59,6 +60,7 @@ export default function Routes(app: Express) {
   const absenController = new AbsenController()
   const ujianController = new UjianController()
   const userAnswerController = new UserAnswerController()
+  const roleController = new RoleController()
 
   // Static
   app.use("/img-profile", express.static("src/storage/profile"))
@@ -128,6 +130,9 @@ export default function Routes(app: Express) {
 
   // Jawaban User
   app.get("/v2/all-exam", userAnswerController.getAnswerUser)
+
+  // Role
+  app.get("/v2/role/:role", roleController.getRole)
 
 
   // app.get("/v2/", )  
