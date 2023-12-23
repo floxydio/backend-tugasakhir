@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
-
+import Joi from 'joi'
 import { prisma } from "../config/database"
 
 
@@ -75,6 +75,31 @@ export class NilaiController {
 */
   public async createNilai(req: Request, res: Response) {
     const { uts, uas, kelas_id, user_id, semester, pelajaran_id } = req.body
+    const schema = Joi.object().keys({
+      uts: Joi.number().required().messages({
+        "any.required": `UTS tidak boleh kosong`,
+      }),
+      uas: Joi.number().required().messages({
+        "any.required": "UAS tidak boleh kosong"
+      }),
+      kelas_id: Joi.number().required().messages({
+        "any.required": "Kelas ID tidak boleh kosong"
+      }),
+      user_id: Joi.number().required().messages({
+        "any.required": "User ID tidak boleh kosong"
+      }),
+      semester: Joi.number().required().messages({
+        "any.required": "Semester tidak boleh kosong"
+      }),
+      pelajaran_id: Joi.number().required().messages({
+        "any.required": "Pelajaran ID tidak boleh kosong"
+      })
+    })
+
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     try {
       await prisma.nilai.create({
         data: {

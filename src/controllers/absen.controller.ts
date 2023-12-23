@@ -1,10 +1,11 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 
 import { prisma } from "../config/database"
 import jwt from "jsonwebtoken"
+import Joi from 'joi'
 
 
 export class AbsenController {
@@ -40,6 +41,41 @@ export class AbsenController {
       year,
       time,
     } = req.body;
+
+    const schema = Joi.object().keys({
+      user_id: Joi.number().required().messages({
+        "any.required": `User Id tidak boleh kosong`,
+      }),
+      guru_id: Joi.number().required().messages({
+        "any.required": `Guru Id tidak boleh kosong`,
+      }),
+      kelas_Id: Joi.number().required().messages({
+        "any.required": `Kelas Id tidak boleh kosong`,
+      }),
+      keterangan: Joi.string().max(250).required().messages({
+        "any.required": `Keterangan tidak boleh kosong`,
+        "string.max": "Maksimal keterangan adalah 250 character"
+      }),
+      reason: Joi.string().required().messages({
+        "any.required": `Alasan tidak boleh kosong`,
+      }),
+      day: Joi.number().required().messages({
+        "any.required": `Day tidak boleh kosong`,
+      }),
+      month: Joi.number().required().messages({
+        "any.required": `Bulan tidak boleh kosong`,
+      }),
+      year: Joi.number().required().messages({
+        "any.required": `Tahun tidak boleh kosong`,
+      }),
+      time: Joi.string().required().messages({
+        "any.required": `Waktu tidak boleh kosong`,
+      }),
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     try {
       await prisma.absen.create({
         data: {
@@ -194,6 +230,43 @@ export class AbsenController {
       year,
       time,
     } = req.body;
+
+
+    const schema = Joi.object().keys({
+      user_id: Joi.number().required().messages({
+        "any.required": `User Id tidak boleh kosong`,
+      }),
+      guru_id: Joi.number().required().messages({
+        "any.required": `Guru Id tidak boleh kosong`,
+      }),
+      kelas_Id: Joi.number().required().messages({
+        "any.required": `Kelas Id tidak boleh kosong`,
+      }),
+      keterangan: Joi.string().max(250).required().messages({
+        "any.required": `Keterangan tidak boleh kosong`,
+        "string.max": "Maksimal keterangan adalah 250 character"
+      }),
+      reason: Joi.string().required().messages({
+        "any.required": `Alasan tidak boleh kosong`,
+      }),
+      day: Joi.number().required().messages({
+        "any.required": `Day tidak boleh kosong`,
+      }),
+      month: Joi.number().required().messages({
+        "any.required": `Bulan tidak boleh kosong`,
+      }),
+      year: Joi.number().required().messages({
+        "any.required": `Tahun tidak boleh kosong`,
+      }),
+      time: Joi.string().required().messages({
+        "any.required": `Waktu tidak boleh kosong`,
+      }),
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
+
     try {
       await prisma.absen.update({
         data: {

@@ -1,7 +1,8 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
+import Joi from 'joi'
 
 import { prisma } from "../config/database"
 export class GuruController {
@@ -122,6 +123,25 @@ export class GuruController {
  */
   public async createGuru(req: Request, res: Response) {
     const { nama, mengajar, rating } = req.body;
+    const schema = Joi.object().keys({
+      nama: Joi.string().required().messages({
+        "any.required": `Nama tidak boleh kosong`,
+
+      }),
+      mengajar: Joi.string().required().messages({
+        "any.required": "Mengajar tidak boleh kosong"
+      }),
+      status_guru: Joi.number().required().messages({
+        "any.required": "Status Guru tidak boleh kosong"
+      }),
+      rating: Joi.number().required().messages({
+        "any.required": "Rating tidak boleh kosong"
+      })
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     try {
       await prisma.guru.create({
         data: {
@@ -157,6 +177,26 @@ export class GuruController {
   public async editGuru(req: Request, res: Response) {
     const id = req.params.id;
     const { nama, mengajar, status_guru, rating } = req.body;
+    const schema = Joi.object().keys({
+      nama: Joi.string().required().messages({
+        "any.required": `Nama tidak boleh kosong`,
+
+      }),
+      mengajar: Joi.string().required().messages({
+        "any.required": "Mengajar tidak boleh kosong"
+      }),
+      status_guru: Joi.number().required().messages({
+        "any.required": "Status Guru tidak boleh kosong"
+      }),
+      rating: Joi.number().required().messages({
+        "any.required": "Rating tidak boleh kosong"
+      })
+    })
+
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     try {
       await prisma.guru.update({
         where: {

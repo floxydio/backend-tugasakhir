@@ -3,12 +3,12 @@ import bcrypt from "bcrypt"
 import { prisma } from "../config/database"
 import { Request, Response, NextFunction } from "express";
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken, successResponseOnlyMessageTokenRole } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import dotenv from "dotenv"
 import multer, { MulterError } from "multer";
 import { v4 as uuidv4 } from 'uuid';
-import path from "path";
+import Joi from 'joi'
 
 dotenv.config()
 export class AuthController {
@@ -24,73 +24,89 @@ export class AuthController {
 * @return {object} 401 - token expired / not found
 */
   public async signIn(req: Request, res: Response) {
-    const { username, password, role } = req.body;
-    console.log(username)
-    if (username.length < 12 && role === "0") {
-      return failedResponse(res, true, "User kurang dari 12 huruf", 400)
-    } else {
-      try {
-        const result = await prisma.users.findMany({
-          select: {
-            id: true,
-            nama: true,
-            status_role: true,
-            status_user: true,
-            password: true,
-            kelas_id: true,
-            username: true,
-          },
-          where: {
-            username: username
-          }
-        })
-        if (result.length < 0) {
-          const status = StatusCode.BAD_REQUEST
-          return successResponse(res, [], "Username / Email Tidak Ditemukan", status)
-        } else {
-          if (result[0].status_user === 0 || result[0].status_user === 2) {
-            const status = StatusCode.BAD_REQUEST
-            return failedResponse(res, true, "User Not Active", status)
-          } else {
-            const hash = result[0].password
-            const compare = bcrypt.compareSync(password, hash);
-            if (compare) {
-              // status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
-              // status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']
-              const token = jwt.sign(
-                {
-                  data: {
-                    id: result[0].id,
-                    nama: result[0].nama,
-                    role: result[0].status_role,
-                    kelas_id: result[0].kelas_id,
-                  },
-                },
-                `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
-              );
-              await prisma.users.update({
-                where: {
-                  username: result[0].username
-                },
-                data: {
-                  user_agent: req.headers["user-agent"]
-                }
-              })
-              const successLogin = StatusCode.SUCCESS
-              return successResponseOnlyMessageTokenRole(res, token, result[0].status_role, "Berhasil Login", successLogin)
-            } else {
-              const status = StatusCode.BAD_REQUEST
-              return failedResponse(res, true, "Password Salah", status)
 
-            }
-          }
-        }
-      } catch (e) {
-        const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-        return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
-      }
+    const { username, password, role } = req.body;
+    const schema = Joi.object().keys({
+      username: Joi.when('role', {
+        is: "0", then: Joi.string().min(10).required().messages({
+          "string.min": "Username harus memiliki 10 character",
+          "any.required": "Username tidak boleh kosong"
+        })
+      }),
+      password: Joi.string().required().messages({
+        "any.required": `Password tidak boleh kosong`,
+
+      }),
+      role: Joi.required().messages({
+        "any.required": "Role tidak boleh kosong harus di isi 0/1"
+      })
+    })
+
+    const { error, value } = schema.validate(req.body)
+    if (error !== null) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
     }
 
+    try {
+      const result = await prisma.users.findMany({
+        select: {
+          id: true,
+          nama: true,
+          status_role: true,
+          status_user: true,
+          password: true,
+          kelas_id: true,
+          username: true,
+        },
+        where: {
+          username: username
+        }
+      })
+      if (result.length < 0) {
+        const status = StatusCode.BAD_REQUEST
+        return successResponse(res, [], "Username / Email Tidak Ditemukan", status)
+      } else {
+        if (result[0].status_user === 0 || result[0].status_user === 2) {
+          const status = StatusCode.BAD_REQUEST
+          return failedResponse(res, true, "User Not Active", status)
+        } else {
+          const hash = result[0].password
+          const compare = bcrypt.compareSync(password, hash);
+          if (compare) {
+            // status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
+            // status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']
+            const token = jwt.sign(
+              {
+                data: {
+                  id: result[0].id,
+                  nama: result[0].nama,
+                  role: result[0].status_role,
+                  kelas_id: result[0].kelas_id,
+                },
+              },
+              `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
+            );
+            await prisma.users.update({
+              where: {
+                username: result[0].username
+              },
+              data: {
+                user_agent: req.headers["user-agent"]
+              }
+            })
+            const successLogin = StatusCode.SUCCESS
+            return successResponseOnlyMessageTokenRole(res, token, result[0].status_role, "Berhasil Login", successLogin)
+          } else {
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, "Password Salah", status)
+
+          }
+        }
+      }
+    } catch (e) {
+      const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+    }
   }
   // Swagger skip
   public async editProfile(req: Request, res: Response) {
@@ -198,8 +214,31 @@ export class AuthController {
 */
   public async signUp(req: Request, res: Response) {
     const { nama, username, password, kelasid, role } = req.body;
-    if (username.length < 10 && role === "0") {
-      return failedResponse(res, true, `Username harus lebih dari 10`, 400)
+    const schema = Joi.object().keys({
+      username: Joi.when('role', {
+        is: "0", then: Joi.string().min(10).required().messages({
+          "string.min": "Username harus memiliki 10 character",
+          "any.required": "Username tidak boleh kosong"
+        })
+      }).when("role", {
+        is: "1", then: Joi.string().required().messages({
+          "any.required": "Username tidak boleh kosong"
+        })
+      }),
+      nama: Joi.string().required().messages({
+        "any.required": "Nama tidak boleh kosong"
+      }),
+      password: Joi.string().min(6).required().messages({
+        "any.required": `Password tidak boleh kosong`,
+        "string.min": `Password minimal 6 huruf`
+      }),
+      role: Joi.required().messages({
+        "any.required": "Role tidak boleh kosong harus di isi 0/1"
+      })
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
     }
     const saltRounds = 10;
     const salt = bcrypt.genSaltSync(saltRounds);

@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
-
+import Joi from 'joi'
 import { prisma } from "../config/database"
 
 export class PelajaranController {
@@ -89,14 +89,34 @@ export class PelajaranController {
 */
   public async insertPelajaran(req: Request, res: Response) {
     const { nama, guruId, kelasId, jadwalId, jam, createdAt } = req.body;
-
+    const schema = Joi.object().keys({
+      nama: Joi.string().required().messages({
+        "any.required": `Nama tidak boleh kosong`,
+      }),
+      guruId: Joi.number().required().messages({
+        "any.required": "Guru ID tidak boleh kosong"
+      }),
+      kelasId: Joi.number().required().messages({
+        "any.required": "Kelas ID tidak boleh kosong"
+      }),
+      jadwalId: Joi.number().required().messages({
+        "any.required": "Jadwal ID tidak boleh kosong"
+      }),
+      jam: Joi.string().required().messages({
+        "any.required": "Jadwal ID tidak boleh kosong"
+      })
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     try {
       await prisma.pelajaran.create({
         data: {
           nama: nama,
-          guru_id: guruId,
-          kelas_id: kelasId,
-          jadwal: jadwalId,
+          guru_id: Number(guruId),
+          kelas_id: Number(kelasId),
+          jadwal: Number(jadwalId),
           jam: jam,
           createdAt: createdAt ?? new Date()
         }
