@@ -3,17 +3,49 @@ import bcrypt from "bcrypt"
 import { prisma } from "../config/database"
 import { Request, Response, NextFunction } from "express";
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken, successResponseOnlyMessageTokenRole } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import dotenv from "dotenv"
 import multer, { MulterError } from "multer";
 import { v4 as uuidv4 } from 'uuid';
-import path from "path";
+import Joi from 'joi'
 
 dotenv.config()
 export class AuthController {
+  /**
+* POST /v2/sign-in
+* @summary Sign In User
+* @tags Auth
+* @param {string} username.form.required - form data - application/x-www-form-urlencoded
+* @param {string} password.form.required - form data - application/x-www-form-urlencoded
+* @param {string} role.form.required - form data - application/x-www-form-urlencoded
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async signIn(req: Request, res: Response) {
-    const { username, password } = req.body;
+
+    const { username, password, role } = req.body;
+    const schema = Joi.object().keys({
+      username: Joi.when('role', {
+        is: "0", then: Joi.string().min(10).required().messages({
+          "string.min": "Username harus memiliki 10 character",
+          "any.required": "Username tidak boleh kosong"
+        })
+      }),
+      password: Joi.string().required().messages({
+        "any.required": `Password tidak boleh kosong`,
+
+      }),
+      role: Joi.required().messages({
+        "any.required": "Role tidak boleh kosong harus di isi 0/1"
+      })
+    })
+
+    const { error, value } = schema.validate(req.body)
+    if (error !== null) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
 
     try {
       const result = await prisma.users.findMany({
@@ -76,7 +108,7 @@ export class AuthController {
       return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
     }
   }
-
+  // Swagger skip
   public async editProfile(req: Request, res: Response) {
     const saltRounds = 10;
     const { nama, password, notelp } = req.body;
@@ -168,10 +200,47 @@ export class AuthController {
     }
 
   }
-
+  /**
+* POST /v2/sign-up
+* @summary Create User
+* @tags Auth
+* @param {string} nama.form.required - form nama - application/x-www-form-urlencoded
+* @param {string} username.form.required - form username - application/x-www-form-urlencoded
+* @param {string} password.form.required - form password - application/x-www-form-urlencoded
+* @param {string} role.form.required - form role 0/1 - application/x-www-form-urlencoded
+* @return {object} 201 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async signUp(req: Request, res: Response) {
+    const { nama, username, password, kelasid, role } = req.body;
+    const schema = Joi.object().keys({
+      username: Joi.when('role', {
+        is: "0", then: Joi.string().min(10).required().messages({
+          "string.min": "Username harus memiliki 10 character",
+          "any.required": "Username tidak boleh kosong"
+        })
+      }).when("role", {
+        is: "1", then: Joi.string().required().messages({
+          "any.required": "Username tidak boleh kosong"
+        })
+      }),
+      nama: Joi.string().required().messages({
+        "any.required": "Nama tidak boleh kosong"
+      }),
+      password: Joi.string().min(6).required().messages({
+        "any.required": `Password tidak boleh kosong`,
+        "string.min": `Password minimal 6 huruf`
+      }),
+      role: Joi.required().messages({
+        "any.required": "Role tidak boleh kosong harus di isi 0/1"
+      })
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     const saltRounds = 10;
-    const { nama, username, password, statususer, kelasid } = req.body;
     const salt = bcrypt.genSaltSync(saltRounds);
     const hash = bcrypt.hashSync(password, salt);
 
@@ -181,10 +250,10 @@ export class AuthController {
           nama: nama,
           username: username,
           password: hash,
-          status_user: Number(0),
+          status_user: Number(1),
           user_agent: req.headers["user-agent"],
-          status_role: Number(0),
-          kelas_id: kelasid
+          status_role: Number(role),
+          kelas_id: kelasid ?? 0
         }
       }).then(() => {
         const successRes = StatusCode.CREATED
@@ -253,6 +322,15 @@ export class AuthController {
     }
   }
 
+  /**
+ * GET /v2/profile-image/{token}
+ * @summary Find Image By Token
+ * @tags Auth
+ * @param {string} token.path - token
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - bad request response
+ * @return {object} 401 - token expired / not found
+ */
   public async getProfileImage(req: Request, res: Response) {
     try {
       jwt.verify(req.params.token, `${process.env.JWT_TOKEN_SECRET}`, async function (err, decode: any) {

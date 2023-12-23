@@ -7,6 +7,14 @@ import { prisma } from "../config/database"
 
 
 export class KelasController {
+  /**
+* GET /v2/kelas
+* @summary Find All Kelas
+* @tags Kelas
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async findKelas(req: Request, res: Response) {
     try {
       let data = await prisma.kelas.findMany()

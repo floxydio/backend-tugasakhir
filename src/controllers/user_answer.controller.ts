@@ -14,7 +14,6 @@ export class UserAnswerController {
             })
             return successResponse(res, data, "Success Get Jawaban User", StatusCode.SUCCESS)
         } catch (e) {
-            console.log(e)
             return failedResponse(res, true, "Failed Get Jawaban User", StatusCode.BAD_REQUEST)
         }
     }

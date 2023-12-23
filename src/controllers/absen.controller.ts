@@ -1,14 +1,33 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 
 import { prisma } from "../config/database"
 import jwt from "jsonwebtoken"
+import Joi from 'joi'
 
 
 export class AbsenController {
-
+  /**
+  * POST /v2/absen
+  * @summary Create Absen
+  * @tags Absen
+  * @param {number} user_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} guru_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} pelajaran_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} kelas_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} keterangan.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} reason.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} day.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} month.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} year.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} time.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} x-access-token.header.required - token
+  * @return {object} 201 - success response - application/json
+  * @return {object} 400 - bad request response
+  * @return {object} 401 - token expired / not found
+  */
   public async sendAbsence(req: Request, res: Response) {
     const {
       user_id,
@@ -22,6 +41,41 @@ export class AbsenController {
       year,
       time,
     } = req.body;
+
+    const schema = Joi.object().keys({
+      user_id: Joi.number().required().messages({
+        "any.required": `User Id tidak boleh kosong`,
+      }),
+      guru_id: Joi.number().required().messages({
+        "any.required": `Guru Id tidak boleh kosong`,
+      }),
+      kelas_Id: Joi.number().required().messages({
+        "any.required": `Kelas Id tidak boleh kosong`,
+      }),
+      keterangan: Joi.string().max(250).required().messages({
+        "any.required": `Keterangan tidak boleh kosong`,
+        "string.max": "Maksimal keterangan adalah 250 character"
+      }),
+      reason: Joi.string().required().messages({
+        "any.required": `Alasan tidak boleh kosong`,
+      }),
+      day: Joi.number().required().messages({
+        "any.required": `Day tidak boleh kosong`,
+      }),
+      month: Joi.number().required().messages({
+        "any.required": `Bulan tidak boleh kosong`,
+      }),
+      year: Joi.number().required().messages({
+        "any.required": `Tahun tidak boleh kosong`,
+      }),
+      time: Joi.string().required().messages({
+        "any.required": `Waktu tidak boleh kosong`,
+      }),
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
     try {
       await prisma.absen.create({
         data: {
@@ -47,9 +101,18 @@ export class AbsenController {
 
     }
 
-
   }
-
+  /**
+* GET /v2/absen/{id}/{month}
+* @summary Find Absen by ID and Month
+* @tags Absen
+* @param {number} id.path.required - user id
+* @param {number} month.path - bulan (berdasarkan nilai: contoh 1 = januari)
+* @param {string} x-access-token.header.required - token
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async getAbsenByUserId(req: Request, res: Response) {
     const { id, month } = req.params;
     try {
@@ -65,6 +128,19 @@ export class AbsenController {
 
   }
 
+  /**
+* GET /v2/absen
+* @summary Find Absen for Dashboard
+* @tags Absen
+* @param {number} search.query - user id
+* @param {string} orderby.query.required - enum:desc,asc - urutan
+* @param {string} gurunama.query - nama guru
+* @param {number} month.query - bulan (berdasarkan nilai: contoh 1 = januari)
+* @param {string} x-access-token.header.required - token
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async getAbsen(req: Request, res: Response) {
     const { search, orderby, gurunama, month } = req.query;
     try {
@@ -117,9 +193,28 @@ export class AbsenController {
       const errorStatus = StatusCode.BAD_REQUEST
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
-
-
   }
+
+  /**
+* PUT /v2/edit-absen/{id}
+* @summary Update Absen
+* @tags Absen
+* @param {number} id.path - id
+* @param {number} user_id.form.required - form data - application/x-www-form-urlencoded
+* @param {number} guru_id.form.required - form data - application/x-www-form-urlencoded
+* @param {number} pelajaran_id.form.required - form data - application/x-www-form-urlencoded
+* @param {number} kelas_id.form.required - form data - application/x-www-form-urlencoded
+* @param {string} keterangan.form.required - form data - application/x-www-form-urlencoded
+* @param {string} reason.form.required - form data - application/x-www-form-urlencoded
+* @param {number} day.form.required - form data - application/x-www-form-urlencoded
+* @param {number} month.form.required - form data - application/x-www-form-urlencoded
+* @param {number} year.form.required - form data - application/x-www-form-urlencoded
+* @param {string} time.form.required - form data - application/x-www-form-urlencoded
+* @param {string} x-access-token.header.required - token
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async updateAbsen(req: Request, res: Response) {
     const id = req.params.id;
 
@@ -135,6 +230,43 @@ export class AbsenController {
       year,
       time,
     } = req.body;
+
+
+    const schema = Joi.object().keys({
+      user_id: Joi.number().required().messages({
+        "any.required": `User Id tidak boleh kosong`,
+      }),
+      guru_id: Joi.number().required().messages({
+        "any.required": `Guru Id tidak boleh kosong`,
+      }),
+      kelas_Id: Joi.number().required().messages({
+        "any.required": `Kelas Id tidak boleh kosong`,
+      }),
+      keterangan: Joi.string().max(250).required().messages({
+        "any.required": `Keterangan tidak boleh kosong`,
+        "string.max": "Maksimal keterangan adalah 250 character"
+      }),
+      reason: Joi.string().required().messages({
+        "any.required": `Alasan tidak boleh kosong`,
+      }),
+      day: Joi.number().required().messages({
+        "any.required": `Day tidak boleh kosong`,
+      }),
+      month: Joi.number().required().messages({
+        "any.required": `Bulan tidak boleh kosong`,
+      }),
+      year: Joi.number().required().messages({
+        "any.required": `Tahun tidak boleh kosong`,
+      }),
+      time: Joi.string().required().messages({
+        "any.required": `Waktu tidak boleh kosong`,
+      }),
+    })
+    const { error, value } = schema.validate(req.body)
+    if (error !== undefined) {
+      return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+    }
+
     try {
       await prisma.absen.update({
         data: {

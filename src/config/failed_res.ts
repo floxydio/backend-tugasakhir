@@ -7,3 +7,12 @@ export const failedResponse = (res: Response, error: boolean, message: string, s
         message,
     })
 }
+
+
+export const failedResponseValidation = (res: Response, error: boolean, message: any, status: number) => {
+    return res.status(status).json({
+        status,
+        error,
+        message,
+    })
+}
