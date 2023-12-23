@@ -104,13 +104,12 @@ export default function Routes(app: Express) {
   // Pelajaran -
   app.get("/v2/pelajaran", pelajaranController.findPelajaran);
   app.get("/v2/find-pelajaran", pelajaranController.findAllDataPelajaran);
-  app.get("/v2/pelajaran/:week/:kelas", authMiddleware, pelajaranController.findAllData);
+  app.get("/v2/pelajaran/:week/:kelas", authMiddleware, pelajaranController.findAllDataWeekKelas);
   app.post("/v2/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
   // End Of Pelajaran
 
   // Nilai
   app.get("/v2/nilai", nilaiController.fetchDataNilai)
-
   app.get("/v2/nilai-all", nilaiController.fetchAllData)
   app.post("/v2/create-nilai", nilaiController.createNilai)
 

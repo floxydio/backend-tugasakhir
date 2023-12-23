@@ -8,7 +8,25 @@ import jwt from "jsonwebtoken"
 
 
 export class AbsenController {
-
+  /**
+  * POST /v2/absen
+  * @summary Create Absen
+  * @tags Absen
+  * @param {number} user_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} guru_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} pelajaran_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} kelas_id.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} keterangan.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} reason.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} day.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} month.form.required - form data - application/x-www-form-urlencoded
+  * @param {number} year.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} time.form.required - form data - application/x-www-form-urlencoded
+  * @param {string} x-access-token.header.required - token
+  * @return {object} 201 - success response - application/json
+  * @return {object} 400 - bad request response
+  * @return {object} 401 - token expired / not found
+  */
   public async sendAbsence(req: Request, res: Response) {
     const {
       user_id,
@@ -47,9 +65,18 @@ export class AbsenController {
 
     }
 
-
   }
-
+  /**
+* GET /v2/absen/{id}/{month}
+* @summary Find Absen by ID and Month
+* @tags Absen
+* @param {number} id.path.required - user id
+* @param {number} month.path - bulan (berdasarkan nilai: contoh 1 = januari)
+* @param {string} x-access-token.header.required - token
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async getAbsenByUserId(req: Request, res: Response) {
     const { id, month } = req.params;
     try {
@@ -65,6 +92,19 @@ export class AbsenController {
 
   }
 
+  /**
+* GET /v2/absen
+* @summary Find Absen for Dashboard
+* @tags Absen
+* @param {number} search.query - user id
+* @param {string} orderby.query.required - enum:desc,asc - urutan
+* @param {string} gurunama.query - nama guru
+* @param {number} month.query - bulan (berdasarkan nilai: contoh 1 = januari)
+* @param {string} x-access-token.header.required - token
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async getAbsen(req: Request, res: Response) {
     const { search, orderby, gurunama, month } = req.query;
     try {
@@ -117,9 +157,28 @@ export class AbsenController {
       const errorStatus = StatusCode.BAD_REQUEST
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
-
-
   }
+
+  /**
+* PUT /v2/edit-absen/{id}
+* @summary Update Absen
+* @tags Absen
+* @param {number} id.path - id
+* @param {number} user_id.form.required - form data - application/x-www-form-urlencoded
+* @param {number} guru_id.form.required - form data - application/x-www-form-urlencoded
+* @param {number} pelajaran_id.form.required - form data - application/x-www-form-urlencoded
+* @param {number} kelas_id.form.required - form data - application/x-www-form-urlencoded
+* @param {string} keterangan.form.required - form data - application/x-www-form-urlencoded
+* @param {string} reason.form.required - form data - application/x-www-form-urlencoded
+* @param {number} day.form.required - form data - application/x-www-form-urlencoded
+* @param {number} month.form.required - form data - application/x-www-form-urlencoded
+* @param {number} year.form.required - form data - application/x-www-form-urlencoded
+* @param {string} time.form.required - form data - application/x-www-form-urlencoded
+* @param {string} x-access-token.header.required - token
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async updateAbsen(req: Request, res: Response) {
     const id = req.params.id;
 

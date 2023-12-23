@@ -8,8 +8,24 @@ import { DataSoal, Essay, PilihanGanda, SoalGet } from "../models/ujian.dto";
 
 
 export class UjianController {
+    /**
+* POST /v2/create-ujian
+* @summary Create Ujian
+* @tags Exam
+* @param {string} nama_ujian.form.required - form data
+* @param {number} durasi.form.required - form data
+* @param {number} jam.form.required - form data
+* @param {number} mapel.form.required - form data
+* @param {string} tanggal.form.required - form data
+* @param {number} total_soal.form.required - form data
+* @param {number} kelas_id.form.required - kelas id
+* @param {object} soal.form.required - form data
+* @param {object} essay.form.required - form data
+* @return {object} 201 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
     public async createUjian(req: Request, res: Response) {
-
         await prisma.ujian.create({
             data: {
                 nama_ujian: req.body.nama_ujian,
@@ -32,7 +48,24 @@ export class UjianController {
 
         })
     }
-
+    /**
+* PUT /v2/edit-ujian/{id}
+* @summary Edit Ujian
+* @tags Exam
+* @param {string} id.path - id
+* @param {string} nama_ujian.form.required - form data
+* @param {number} durasi.form.required - form data
+* @param {number} jam.form.required - form data
+* @param {number} mapel.form.required - form data
+* @param {string} tanggal.form.required - form data
+* @param {number} total_soal.form.required - form data
+* @param {number} kelas_id.form.required - kelas id
+* @param {object} soal.form.required - form data
+* @param {object} essay.form.required - form data
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
     public async updateUjian(req: Request, res: Response) {
         const { id } = req.params
         await prisma.ujian.update({
@@ -61,7 +94,14 @@ export class UjianController {
         })
     }
 
-
+    /**
+   * GET /v2/all-ujian
+   * @summary Find All Ujian
+   * @tags Exam
+   * @return {object} 200 - success response - application/json
+   * @return {object} 400 - bad request response
+   * @return {object} 401 - token expired / not found
+   */
     public async getAllUjian(req: Request, res: Response) {
         try {
             const data = await prisma.$queryRaw`SELECT ujian.id,ujian.durasi,ujian.kelas_id, ujian.nama_ujian, ujian.tanggal, pelajaran.id as pelajaran_id ,pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
@@ -72,7 +112,15 @@ export class UjianController {
         }
     }
 
-
+    /**
+    * GET /v2/ujian/{id}
+    * @summary Find Ujian
+    * @tags Exam
+    * @param {string} id.path - id
+    * @return {object} 200 - success response - application/json
+    * @return {object} 400 - bad request response
+    * @return {object} 401 - token expired / not found
+    */
     public async getUjian(req: Request, res: Response) {
         const data = await prisma.ujian.findMany({
             where: {
@@ -105,6 +153,15 @@ export class UjianController {
         }, "Success Get Ujian", 200)
     }
 
+    /**
+* GET /v2/ujian-detail/{id}
+* @summary Find Ujian Detail
+* @tags Exam
+* @param {string} id.path - id
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
     public async getDetailById(req: Request, res: Response) {
         const data = await prisma.ujian.findFirst({
             where: {

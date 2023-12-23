@@ -12,71 +12,87 @@ import path from "path";
 
 dotenv.config()
 export class AuthController {
+  /**
+* POST /v2/sign-in
+* @summary Sign In User
+* @tags Auth
+* @param {string} username.form.required - form data - application/x-www-form-urlencoded
+* @param {string} password.form.required - form data - application/x-www-form-urlencoded
+* @param {string} role.form.required - form data - application/x-www-form-urlencoded
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async signIn(req: Request, res: Response) {
-    const { username, password } = req.body;
-
-    try {
-      const result = await prisma.users.findMany({
-        select: {
-          id: true,
-          nama: true,
-          status_role: true,
-          status_user: true,
-          password: true,
-          kelas_id: true,
-          username: true,
-        },
-        where: {
-          username: username
-        }
-      })
-      if (result.length < 0) {
-        const status = StatusCode.BAD_REQUEST
-        return successResponse(res, [], "Username / Email Tidak Ditemukan", status)
-      } else {
-        if (result[0].status_user === 0 || result[0].status_user === 2) {
+    const { username, password, role } = req.body;
+    console.log(username)
+    if (username.length < 12 && role === "0") {
+      return failedResponse(res, true, "User kurang dari 12 huruf", 400)
+    } else {
+      try {
+        const result = await prisma.users.findMany({
+          select: {
+            id: true,
+            nama: true,
+            status_role: true,
+            status_user: true,
+            password: true,
+            kelas_id: true,
+            username: true,
+          },
+          where: {
+            username: username
+          }
+        })
+        if (result.length < 0) {
           const status = StatusCode.BAD_REQUEST
-          return failedResponse(res, true, "User Not Active", status)
+          return successResponse(res, [], "Username / Email Tidak Ditemukan", status)
         } else {
-          const hash = result[0].password
-          const compare = bcrypt.compareSync(password, hash);
-          if (compare) {
-            // status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
-            // status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']
-            const token = jwt.sign(
-              {
-                data: {
-                  id: result[0].id,
-                  nama: result[0].nama,
-                  role: result[0].status_role,
-                  kelas_id: result[0].kelas_id,
-                },
-              },
-              `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
-            );
-            await prisma.users.update({
-              where: {
-                username: result[0].username
-              },
-              data: {
-                user_agent: req.headers["user-agent"]
-              }
-            })
-            const successLogin = StatusCode.SUCCESS
-            return successResponseOnlyMessageTokenRole(res, token, result[0].status_role, "Berhasil Login", successLogin)
-          } else {
+          if (result[0].status_user === 0 || result[0].status_user === 2) {
             const status = StatusCode.BAD_REQUEST
-            return failedResponse(res, true, "Password Salah", status)
+            return failedResponse(res, true, "User Not Active", status)
+          } else {
+            const hash = result[0].password
+            const compare = bcrypt.compareSync(password, hash);
+            if (compare) {
+              // status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
+              // status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']
+              const token = jwt.sign(
+                {
+                  data: {
+                    id: result[0].id,
+                    nama: result[0].nama,
+                    role: result[0].status_role,
+                    kelas_id: result[0].kelas_id,
+                  },
+                },
+                `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
+              );
+              await prisma.users.update({
+                where: {
+                  username: result[0].username
+                },
+                data: {
+                  user_agent: req.headers["user-agent"]
+                }
+              })
+              const successLogin = StatusCode.SUCCESS
+              return successResponseOnlyMessageTokenRole(res, token, result[0].status_role, "Berhasil Login", successLogin)
+            } else {
+              const status = StatusCode.BAD_REQUEST
+              return failedResponse(res, true, "Password Salah", status)
 
+            }
           }
         }
+      } catch (e) {
+        const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+        return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
       }
-    } catch (e) {
-      const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
     }
-  }
 
+  }
+  // Swagger skip
   public async editProfile(req: Request, res: Response) {
     const saltRounds = 10;
     const { nama, password, notelp } = req.body;
@@ -168,10 +184,24 @@ export class AuthController {
     }
 
   }
-
+  /**
+* POST /v2/sign-up
+* @summary Create User
+* @tags Auth
+* @param {string} nama.form.required - form nama - application/x-www-form-urlencoded
+* @param {string} username.form.required - form username - application/x-www-form-urlencoded
+* @param {string} password.form.required - form password - application/x-www-form-urlencoded
+* @param {string} role.form.required - form role 0/1 - application/x-www-form-urlencoded
+* @return {object} 201 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
   public async signUp(req: Request, res: Response) {
+    const { nama, username, password, kelasid, role } = req.body;
+    if (username.length < 10 && role === "0") {
+      return failedResponse(res, true, `Username harus lebih dari 10`, 400)
+    }
     const saltRounds = 10;
-    const { nama, username, password, statususer, kelasid } = req.body;
     const salt = bcrypt.genSaltSync(saltRounds);
     const hash = bcrypt.hashSync(password, salt);
 
@@ -181,9 +211,9 @@ export class AuthController {
           nama: nama,
           username: username,
           password: hash,
-          status_user: Number(0),
+          status_user: Number(1),
           user_agent: req.headers["user-agent"],
-          status_role: Number(0),
+          status_role: Number(role),
           kelas_id: kelasid ?? 0
         }
       }).then(() => {
@@ -253,6 +283,15 @@ export class AuthController {
     }
   }
 
+  /**
+ * GET /v2/profile-image/{token}
+ * @summary Find Image By Token
+ * @tags Auth
+ * @param {string} token.path - token
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - bad request response
+ * @return {object} 401 - token expired / not found
+ */
   public async getProfileImage(req: Request, res: Response) {
     try {
       jwt.verify(req.params.token, `${process.env.JWT_TOKEN_SECRET}`, async function (err, decode: any) {

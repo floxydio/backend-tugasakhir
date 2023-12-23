@@ -8,7 +8,6 @@ import { prisma } from "../config/database"
 export class RoleController {
     public async getRole(req: Request, res: Response) {
         const role = req.params.role
-
         await prisma.role_user.findMany({
             where: {
                 role_id: Number(role)
