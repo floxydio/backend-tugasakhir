@@ -27,20 +27,18 @@ export class AuthController {
 
     const { username, password, role } = req.body;
     const schema = Joi.object().keys({
-      username: Joi.when('role', {
-        is: "0", then: Joi.string().min(10).required().messages({
-          "string.min": "Username harus memiliki 10 character",
-          "any.required": "Username tidak boleh kosong"
-        })
+      username: Joi.string().required().messages({
+        "string.min": "Username harus memiliki 10 character",
+        "any.required": "Username tidak boleh kosong"
       }),
       password: Joi.string().required().messages({
         "any.required": `Password tidak boleh kosong`,
 
       }),
-      role: Joi.required().messages({
+      role: Joi.number().required().messages({
         "any.required": "Role tidak boleh kosong harus di isi 0/1"
       })
-    })
+    }).unknown(true)
 
     const { error, value } = schema.validate(req.body)
     if (error !== undefined) {
@@ -50,7 +48,7 @@ export class AuthController {
     try {
       const result = await prisma.users.findMany({
         select: {
-          id: true,
+          user_id: true,
           nama: true,
           status_role: true,
           status_user: true,
@@ -59,10 +57,11 @@ export class AuthController {
           username: true,
         },
         where: {
-          username: username
+          username: username,
+          status_role: Number(role)
         }
       })
-      if (result.length < 0) {
+      if (result.length === 0) {
         const status = StatusCode.BAD_REQUEST
         return successResponse(res, [], "Username / Email Tidak Ditemukan", status)
       } else {
@@ -78,7 +77,7 @@ export class AuthController {
             const token = jwt.sign(
               {
                 data: {
-                  id: result[0].id,
+                  id: result[0].user_id,
                   nama: result[0].nama,
                   role: result[0].status_role,
                   kelas_id: result[0].kelas_id,
@@ -123,7 +122,7 @@ export class AuthController {
           const hash = bcrypt.hashSync(password, salt);
           await prisma.users.update({
             where: {
-              id: Number(id)
+              user_id: Number(id)
             }, data: {
               nama: nama,
               password: hash,
@@ -141,7 +140,7 @@ export class AuthController {
         try {
           await prisma.users.update({
             where: {
-              id: Number(id)
+              user_id: Number(id)
             }, data: {
               nama: nama,
               notelp: notelp,
@@ -162,7 +161,7 @@ export class AuthController {
           const hash = bcrypt.hashSync(password, salt);
           await prisma.users.update({
             where: {
-              id: Number(id)
+              user_id: Number(id)
             }, data: {
               nama: nama,
               password: hash,
@@ -181,7 +180,7 @@ export class AuthController {
         try {
           await prisma.users.update({
             where: {
-              id: Number(id)
+              user_id: Number(id)
             }, data: {
               nama: nama,
               notelp: notelp,
@@ -271,7 +270,7 @@ export class AuthController {
     try {
       const user = await prisma.users.findMany({
         select: {
-          id: true,
+          user_id: true,
           nama: true,
           status_user: true,
           status_role: true,
@@ -284,6 +283,39 @@ export class AuthController {
       })
       const successRes = StatusCode.SUCCESS
       return successResponse(res, user, "Successfully Get User Status User 3", successRes)
+    } catch (e) {
+      const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+
+    }
+  }
+
+
+
+  /**
+  * GET /v2/list-user-guru
+  * @summary Find From Role
+  * @tags Auth
+  * @return {object} 200 - success response - application/json
+  * @return {object} 400 - bad request response
+  * @return {object} 401 - token expired / not found
+  */
+  public async getUserFromStatusRole(req: Request, res: Response) {
+    try {
+      const user = await prisma.users.findMany({
+        select: {
+          user_id: true,
+          nama: true,
+          status_role: true,
+          notelp: true,
+          kelas_id: true
+        },
+        where: {
+          status_role: 1
+        }
+      })
+      const successRes = StatusCode.SUCCESS
+      return successResponse(res, user, "Successfully Get User By Role Guru", successRes)
     } catch (e) {
       const failedRes = StatusCode.INTERNAL_SERVER_ERROR
       return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
@@ -340,7 +372,7 @@ export class AuthController {
         } else {
           await prisma.users.findFirst({
             where: {
-              id: decode.data.id
+              user_id: decode.data.id
             },
             select: {
               profile_pic: true,

@@ -49,7 +49,7 @@ export class AbsenController {
       guru_id: Joi.number().required().messages({
         "any.required": `Guru Id tidak boleh kosong`,
       }),
-      kelas_Id: Joi.number().required().messages({
+      kelas_id: Joi.number().required().messages({
         "any.required": `Kelas Id tidak boleh kosong`,
       }),
       keterangan: Joi.string().max(250).required().messages({
@@ -71,7 +71,7 @@ export class AbsenController {
       time: Joi.string().required().messages({
         "any.required": `Waktu tidak boleh kosong`,
       }),
-    })
+    }).unknown(true)
     const { error, value } = schema.validate(req.body)
     if (error !== undefined) {
       return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
@@ -230,8 +230,6 @@ export class AbsenController {
       year,
       time,
     } = req.body;
-
-
     const schema = Joi.object().keys({
       user_id: Joi.number().required().messages({
         "any.required": `User Id tidak boleh kosong`,
@@ -239,7 +237,7 @@ export class AbsenController {
       guru_id: Joi.number().required().messages({
         "any.required": `Guru Id tidak boleh kosong`,
       }),
-      kelas_Id: Joi.number().required().messages({
+      kelas_id: Joi.number().required().messages({
         "any.required": `Kelas Id tidak boleh kosong`,
       }),
       keterangan: Joi.string().max(250).required().messages({

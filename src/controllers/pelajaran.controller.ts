@@ -16,10 +16,17 @@ export class PelajaranController {
  */
   public async findAllDataPelajaran(req: Request, res: Response) {
     try {
-      await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,pelajaran.jam,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
-        const successRes = StatusCode.SUCCESS
-        return successResponse(res, p, "Successfully GET Pelajaran", successRes)
+      // await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,pelajaran.jam,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
+      //   const successRes = StatusCode.SUCCESS
+      //   return successResponse(res, p, "Successfully GET Pelajaran", successRes)
+      // })
+      const data = await prisma.pelajaran.findMany({
+        include: {
+          kelas: true
+        }
       })
+      const successRes = StatusCode.SUCCESS
+      return successResponse(res, data, "Successfully GET Pelajaran", successRes)
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
@@ -41,10 +48,43 @@ export class PelajaranController {
   public async findAllDataWeekKelas(req: Request, res: Response) {
     const { week, kelas } = req.params
     try {
-      await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id WHERE pelajaran.jadwal = ${week} AND pelajaran.kelas_id = ${kelas}`.then((p) => {
-        const successRes = StatusCode.SUCCESS
-        return successResponse(res, p, "Successfully GET Pelajaran", successRes)
+      // await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id WHERE pelajaran.jadwal = ${week} AND pelajaran.kelas_id = ${kelas}`.then((p) => {
+      //   const successRes = StatusCode.SUCCESS
+      //   return successResponse(res, p, "Successfully GET Pelajaran", successRes)
+      // })
+
+      const data = await prisma.pelajaran.findMany({
+        where: {
+          jadwal: Number(week),
+          kelas_id: Number(kelas)
+        },
+        select: {
+          pelajaran_id: true,
+          nama: true,
+          kelas: {
+            select: {
+              id: true,
+              nomor: true,
+
+            }
+          },
+          users: {
+            select: {
+              user_id: true,
+              nama: true,
+            }
+          }
+        }
       })
+
+      if (data.length === 0) {
+        const errorStatus = StatusCode.SUCCESS
+        return failedResponse(res, true, `Data Kosong`, errorStatus)
+      } else {
+        const successRes = StatusCode.SUCCESS
+        return successResponse(res, data, "Successfully GET Pelajaran", successRes)
+      }
+
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
@@ -62,11 +102,28 @@ export class PelajaranController {
  */
   public async findPelajaran(req: Request, res: Response) {
     try {
-      await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor, pelajaran.jam FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
-        const successRes = StatusCode.SUCCESS
-        return successResponse(res, p, "Successfully GET Pelajaran", successRes)
-      })
+      // await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor, pelajaran.jam FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
+      //   const successRes = StatusCode.SUCCESS
+      //   return successResponse(res, p, "Successfully GET Pelajaran", successRes)
+      // })
+      const data = await prisma.pelajaran.findMany({
+        include: {
+          users: {
+            select: {
+              nama: true,
+              user_id: true,
 
+            }
+          },
+          kelas: {
+            select: {
+              nomor: true
+            }
+          }
+        }
+      })
+      const successRes = StatusCode.SUCCESS
+      return successResponse(res, data, "Successfully GET Pelajaran", successRes)
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
@@ -102,10 +159,11 @@ export class PelajaranController {
       jadwalId: Joi.number().required().messages({
         "any.required": "Jadwal ID tidak boleh kosong"
       }),
-      jam: Joi.string().required().messages({
-        "any.required": "Jadwal ID tidak boleh kosong"
+      jam: Joi.string().regex(RegExp('^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$')).required().messages({
+        "any.required": "Jam tidak boleh kosong",
+        "string.pattern.base": "Waktu tidak sesuai - Contoh 17:00"
       })
-    })
+    }).unknown(true)
     const { error, value } = schema.validate(req.body)
     if (error !== undefined) {
       return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
@@ -114,7 +172,7 @@ export class PelajaranController {
       await prisma.pelajaran.create({
         data: {
           nama: nama,
-          guru_id: Number(guruId),
+          user_id: Number(guruId),
           kelas_id: Number(kelasId),
           jadwal: Number(jadwalId),
           jam: jam,

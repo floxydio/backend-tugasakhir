@@ -70,6 +70,7 @@ export default function Routes(app: Express) {
   app.post("/v2/sign-in", userController.signIn);
   app.get("/v2/refresh-token", userController.getDecodeJWT);
   app.get("/v2/list-users", authMiddleware, userController.getUserFromStatusUser);
+  app.get("/v2/list-user-guru", userController.getUserFromStatusRole)
   app.get("/v2/profile-image/:token", authMiddleware, userController.getProfileImage)
   app.put("/v2/edit-profile/:id", authMiddleware, upload.single("profile"), userController.editProfile, (error: Error, req: Request, res: Response, next: NextFunction) => {
     if (error) {
@@ -125,6 +126,7 @@ export default function Routes(app: Express) {
   app.post("/v2/ujian-submitted", ujianController.createSubmittedExam)
   app.get("/v2/ujian-result/:idujian", ujianController.getResultExam)
   app.get("/v2/check-exam/:idujian", ujianController.checkUserAlreadyExam)
+  app.get("/v2/exam-result/:userid", ujianController.getResultByUserId)
   app.put("/v2/edit-ujian/:id", ujianController.updateUjian)
 
   // Jawaban User
@@ -132,7 +134,7 @@ export default function Routes(app: Express) {
 
   // Role
   app.get("/v2/role/:role", roleController.getRole)
-
+  app.post("/v2/create-role", roleController.createRole)
 
   // app.get("/v2/", )  
   // app.get("/v2/")

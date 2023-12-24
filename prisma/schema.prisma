@@ -56,10 +56,12 @@ model jumlah {
 }
 
 model kelas {
-  id           Int    @id @default(autoincrement())
-  wali         String @db.VarChar(255)
+  id           Int         @id @default(autoincrement())
+  wali         String      @db.VarChar(255)
   nomor        Int
   jumlah_orang Int
+  pelajaran    pelajaran[]
+  ujian        ujian[]
 }
 
 model nilai {
@@ -74,27 +76,36 @@ model nilai {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pelajaran {
-  id        Int       @id @default(autoincrement())
-  nama      String    @db.VarChar(255)
-  guru_id   Int
-  kelas_id  Int
-  jadwal    Int
-  jam       String    @db.VarChar(255)
-  createdAt DateTime  @db.Date
-  updatedAt DateTime? @db.Date
+  pelajaran_id Int       @id @default(autoincrement())
+  nama         String    @db.VarChar(255)
+  user_id      Int
+  kelas_id     Int
+  jadwal       Int
+  jam          String    @db.VarChar(255)
+  createdAt    DateTime  @db.Date
+  updatedAt    DateTime? @db.Date
+  users        users     @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "pelajaran_ibfk_1")
+  kelas        kelas     @relation(fields: [kelas_id], references: [id], onUpdate: Restrict, map: "pelajaran_ibfk_2")
+  ujian        ujian[]
+
+  @@index([kelas_id], map: "kelas_id")
+  @@index([user_id], map: "user_id")
 }
 
 model users {
-  id          Int     @id @default(autoincrement())
-  nama        String  @db.VarChar(255)
-  username    String  @unique(map: "username") @db.VarChar(255)
-  password    String  @db.VarChar(255)
-  status_user Int     @default(0)
-  status_role Int     @default(0)
-  user_agent  String? @db.VarChar(255)
-  profile_pic String  @default("default.jpg") @db.VarChar(255)
-  notelp      Int     @default(0)
-  kelas_id    Int?
+  user_id      Int            @id @default(autoincrement())
+  nama         String         @db.VarChar(255)
+  username     String         @unique(map: "username") @db.VarChar(255)
+  password     String         @db.VarChar(255)
+  status_user  Int            @default(0)
+  status_role  Int            @default(0)
+  user_agent   String?        @db.VarChar(255)
+  profile_pic  String         @default("default.jpg") @db.VarChar(255)
+  notelp       Int            @default(0)
+  kelas_id     Int?
+  jawaban_user jawaban_user[]
+  log_ujian    log_ujian[]
+  pelajaran    pelajaran[]
 }
 
 model todo {
@@ -117,6 +128,11 @@ model ujian {
   kelas_id       Int
   createdAt      DateTime  @db.Date
   updatedAt      DateTime? @db.Date
+  pelajaran      pelajaran @relation(fields: [mata_pelajaran], references: [pelajaran_id], onUpdate: Restrict, map: "ujian_ibfk_1")
+  kelas          kelas     @relation(fields: [kelas_id], references: [id], onUpdate: Restrict, map: "ujian_ibfk_2")
+
+  @@index([mata_pelajaran], map: "mata_pelajaran")
+  @@index([kelas_id], map: "kelas_id")
 }
 
 model absen_guru {
@@ -131,15 +147,18 @@ model absen_guru {
 }
 
 model jawaban_user {
-  id            Int      @id @default(autoincrement())
-  user_id       Int
-  jawaban_pg    String?  @db.Text
-  jawaban_essay String?  @db.Text
-  ujian_id      Int
-  total_benar   Int
-  total_salah   Int
-  log_history   String?  @db.Text
-  submittedAt   DateTime @db.DateTime(0)
+  jawaban_user_id Int      @id @default(autoincrement())
+  user_id         Int
+  jawaban_pg      String?  @db.Text
+  jawaban_essay   String?  @db.Text
+  ujian_id        Int
+  total_benar     Int
+  total_salah     Int
+  log_history     String?  @db.Text
+  submittedAt     DateTime @db.DateTime(0)
+  users           users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "jawaban_user_ibfk_1")
+
+  @@index([user_id], map: "user_id")
 }
 
 model log_ujian {
@@ -148,6 +167,9 @@ model log_ujian {
   soal_jawaban String   @db.Text
   user_id      Int
   createdAt    DateTime @db.Date
+  users        users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "log_ujian_ibfk_1")
+
+  @@index([user_id], map: "user_id")
 }
 
 model role_user {

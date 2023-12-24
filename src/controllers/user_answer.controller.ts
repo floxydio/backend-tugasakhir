@@ -22,7 +22,7 @@ export class UserAnswerController {
         try {
             await prisma.jawaban_user.updateMany({
                 where: {
-                    id: Number(req.params.id),
+                    jawaban_user_id: Number(req.params.id),
                     user_id: Number(req.params.user_id)
                 },
                 data: {
