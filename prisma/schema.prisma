@@ -114,22 +114,24 @@ model todo {
 }
 
 model ujian {
-  id             Int       @id @default(autoincrement())
-  nama_ujian     String    @db.VarChar(255)
-  tanggal        DateTime  @db.Date
+  id             Int            @id @default(autoincrement())
+  nama_ujian     String         @db.VarChar(255)
+  tanggal        DateTime       @db.Date
   mata_pelajaran Int
   durasi         Int
-  soal           String    @db.LongText
-  essay          String    @db.LongText
-  jam_mulai      String    @db.VarChar(255)
-  keterangan     String    @db.VarChar(255)
-  status_ujian   Int       @default(0)
+  semester       Int?
+  soal           String         @db.LongText
+  essay          String         @db.LongText
+  jam_mulai      String         @db.VarChar(255)
+  keterangan     String         @db.VarChar(255)
+  status_ujian   Int            @default(0)
   total_soal     Int
   kelas_id       Int
-  createdAt      DateTime  @db.Date
-  updatedAt      DateTime? @db.Date
-  pelajaran      pelajaran @relation(fields: [mata_pelajaran], references: [pelajaran_id], onUpdate: Restrict, map: "ujian_ibfk_1")
-  kelas          kelas     @relation(fields: [kelas_id], references: [id], onUpdate: Restrict, map: "ujian_ibfk_2")
+  createdAt      DateTime       @db.Date
+  updatedAt      DateTime?      @db.Date
+  jawaban_user   jawaban_user[]
+  pelajaran      pelajaran      @relation(fields: [mata_pelajaran], references: [pelajaran_id], onUpdate: Restrict, map: "ujian_ibfk_1")
+  kelas          kelas          @relation(fields: [kelas_id], references: [id], onUpdate: Restrict, map: "ujian_ibfk_2")
 
   @@index([mata_pelajaran], map: "mata_pelajaran")
   @@index([kelas_id], map: "kelas_id")
@@ -154,11 +156,14 @@ model jawaban_user {
   ujian_id        Int
   total_benar     Int
   total_salah     Int
+  semester        Int?
   log_history     String?  @db.Text
   submittedAt     DateTime @db.DateTime(0)
   users           users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "jawaban_user_ibfk_1")
+  ujian           ujian    @relation(fields: [ujian_id], references: [id], onUpdate: Restrict, map: "jawaban_user_ibfk_2")
 
   @@index([user_id], map: "user_id")
+  @@index([ujian_id], map: "ujian_id")
 }
 
 model log_ujian {

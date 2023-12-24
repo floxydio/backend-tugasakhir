@@ -52,6 +52,9 @@ export class UjianController {
             kelas_id: Joi.number().required().messages({
                 "any.required": "Kelas ID tidak boleh kosong"
             }),
+            semester: Joi.number().required().messages({
+                "any.required": "Semester tidak boleh kosong"
+            })
         }).unknown(true)
         const { error, value } = schema.validate(req.body)
         if (error !== undefined) {
@@ -64,6 +67,7 @@ export class UjianController {
                 jam_mulai: req.body.jam,
                 mata_pelajaran: Number(req.body.mapel),
                 tanggal: req.body.tanggal,
+                semester: Number(req.body.semester),
                 keterangan: req.body.keterangan,
                 total_soal: Number(req.body.total_soal),
                 kelas_id: Number(req.body.kelas_id),
@@ -349,7 +353,9 @@ export class UjianController {
 * GET /v2/exam-result/{userid}
 * @summary Find Ujian Result by ID User
 * @tags Exam
-* @param {string} userid.path - id
+* @param {string} userid.path.required - id
+* @param {number} semester.query - enum:1,2,3,4,5,6 - semester
+* @param {string} nama_ujian.query - enum:Ujian Tengah Semester,Ujian Akhir Semester,Ulangan Harian - select type
 * @return {object} 200 - success response - application/json
 * @return {object} 400 - bad request response
 * @return {object} 401 - token expired / not found
@@ -359,6 +365,18 @@ export class UjianController {
             const data = await prisma.jawaban_user.findMany({
                 where: {
                     user_id: Number(req.params.userid),
+                    semester: Number(req.query.semester) ?? null,
+                    ujian: {
+                        nama_ujian: String(req.query.nama_ujian) ?? null,
+                    }
+                },
+                include: {
+                    ujian: {
+                        select: {
+                            id: true,
+                            nama_ujian: true
+                        }
+                    }
                 }
             })
             return res.status(200).json({
