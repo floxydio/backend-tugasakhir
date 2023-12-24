@@ -43,7 +43,7 @@ export class AuthController {
     })
 
     const { error, value } = schema.validate(req.body)
-    if (error !== null) {
+    if (error !== undefined) {
       return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
     }
 

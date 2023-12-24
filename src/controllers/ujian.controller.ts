@@ -1,10 +1,11 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import jwt from 'jsonwebtoken'
 import { prisma } from "../config/database"
 import { DataSoal, Essay, PilihanGanda, SoalGet } from "../models/ujian.dto";
+import Joi from 'joi'
 
 
 export class UjianController {
@@ -26,6 +27,37 @@ export class UjianController {
 * @return {object} 401 - token expired / not found
 */
     public async createUjian(req: Request, res: Response) {
+        console.log(req.body.soal)
+        const schema = Joi.object().keys({
+            nama_ujian: Joi.string().required().messages({
+                "any.required": `Nama Ujian tidak boleh kosong`,
+            }),
+            durasi: Joi.number().required().messages({
+                "any.required": "Durasi tidak boleh kosong"
+            }),
+            jam: Joi.string().required().messages({
+                "any.required": "Jam Mulai tidak boleh kosong"
+            }),
+            mapel: Joi.number().required().messages({
+                "any.required": "Mata Pelajaran ID tidak boleh kosong"
+            }),
+            tanggal: Joi.string().required().messages({
+                "any.required": "Tanggal tidak boleh kosong"
+            }),
+            keterangan: Joi.string().required().messages({
+                "any.required": "Keterangan tidak boleh kosong"
+            }),
+            total_soal: Joi.number().required().messages({
+                "any.required": "Total Soal tidak boleh kosong"
+            }),
+            kelas_id: Joi.number().required().messages({
+                "any.required": "Kelas ID tidak boleh kosong"
+            }),
+        }).unknown(true)
+        const { error, value } = schema.validate(req.body)
+        if (error !== undefined) {
+            return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+        }
         await prisma.ujian.create({
             data: {
                 nama_ujian: req.body.nama_ujian,
@@ -33,9 +65,9 @@ export class UjianController {
                 jam_mulai: req.body.jam,
                 mata_pelajaran: Number(req.body.mapel),
                 tanggal: req.body.tanggal,
-                keterangan: req.body.keterangan ?? "",
+                keterangan: req.body.keterangan,
                 total_soal: Number(req.body.total_soal),
-                kelas_id: 1,
+                kelas_id: Number(req.body.kelas_id),
                 createdAt: new Date().toISOString(),
                 soal: JSON.stringify(req.body.soal),
                 essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
