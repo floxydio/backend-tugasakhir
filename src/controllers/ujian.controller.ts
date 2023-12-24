@@ -219,6 +219,17 @@ export class UjianController {
 
         })
     }
+
+    /**
+* GET /v2/ujian-result/{idujian}
+* @summary Find Result Exam By IdUser
+* @tags Exam
+* @param {number} idujian.path.required - id Ujian
+* @param {number} iduser.query.required - id Ujian
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
     public async getResultExam(req: Request, res: Response) {
         if (req.query.iduser === undefined || req.params.idujian === undefined) {
             return failedResponse(res, true, `ID Ujian atau ID User Dibutuhkan`, 400)
