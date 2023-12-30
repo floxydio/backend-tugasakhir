@@ -220,6 +220,7 @@ export class UjianController {
         };
         return res.status(200).json({
             message: "Success get ujian detail by id",
+            semester: data?.semester,
             soal: soal,
             essay: essay
         });
@@ -245,6 +246,7 @@ export class UjianController {
                         total_benar: 0,
                         total_salah: 0,
                         ujian_id: Number(req.body.idujian),
+                        semester: Number(req.body.semester),
                         user_id: decoded.data.id,
                         log_history: "Menunggu Review"
                     }

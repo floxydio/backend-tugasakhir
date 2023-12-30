@@ -68,6 +68,8 @@ export default function Routes(app: Express) {
   // Auth --
   app.post("/v2/sign-up", userController.signUp);
   app.post("/v2/sign-in", userController.signIn);
+  app.post("/v2/guru/sign-in", userController.signInGuru)
+  app.post("/v2/guru/sign-up", userController.signUpGuru)
   app.get("/v2/refresh-token", userController.getDecodeJWT);
   app.get("/v2/list-users", authMiddleware, userController.getUserFromStatusUser);
   app.get("/v2/list-user-guru", userController.getUserFromStatusRole)
@@ -93,6 +95,7 @@ export default function Routes(app: Express) {
   // Absen --
   app.post("/v2/absen", authMiddleware, absenController.sendAbsence);
   app.get("/v2/absen/:id/:month", authMiddleware, absenController.getAbsenByUserId);
+  app.get("/v2/absen/:userId/:day/:month/:year", absenController.findAbsenByToday)
   app.get("/v2/absen/detail/:id/:month", authMiddleware, absenController.absenDetailByUserIdAndMOnth)
   app.get("/v2/absen", authMiddleware, absenController.getAbsen);
   app.put("/v2/edit-absen/:id", authMiddleware, absenController.updateAbsen);
@@ -105,7 +108,7 @@ export default function Routes(app: Express) {
   // Pelajaran -
   app.get("/v2/pelajaran", pelajaranController.findPelajaran);
   app.get("/v2/find-pelajaran", pelajaranController.findAllDataPelajaran);
-  app.get("/v2/pelajaran/:week/:kelas", authMiddleware, pelajaranController.findAllDataWeekKelas);
+  app.get("/v2/pelajaran/:week", authMiddleware, pelajaranController.findAllDataWeekKelas);
   app.post("/v2/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
   // End Of Pelajaran
 
@@ -133,7 +136,7 @@ export default function Routes(app: Express) {
   app.get("/v2/all-exam", userAnswerController.getAnswerUser)
 
   // Role
-  app.get("/v2/role/:role", roleController.getRole)
+  app.get("/v2/role", roleController.getRole)
   app.post("/v2/create-role", roleController.createRole)
 
   // app.get("/v2/", )  

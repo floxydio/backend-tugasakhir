@@ -9,7 +9,7 @@ dotenv.config()
 
 export class RoleController {
     /**
-* GET /v2/role/{role}
+* GET /v2/role
 * @summary Find Page by Role
 * @tags Role
 * @param {number} role.path.required - role by number
@@ -18,11 +18,7 @@ export class RoleController {
 * @return {object} 401 - token expired / not found
 */
     public async getRole(req: Request, res: Response) {
-        const role = req.params.role
         await prisma.role_user.findMany({
-            where: {
-                role_id: Number(role)
-            }
         }).then((data) => {
             const successStatus = StatusCode.SUCCESS
             return successResponse(res, data, "Successfully Find Role", successStatus)

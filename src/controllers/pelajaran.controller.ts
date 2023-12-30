@@ -64,7 +64,7 @@ export class PelajaranController {
           kelas: {
             select: {
               id: true,
-              nomor: true,
+              nomor_kelas: true,
 
             }
           },
@@ -117,7 +117,7 @@ export class PelajaranController {
           },
           kelas: {
             select: {
-              nomor: true
+              nomor_kelas: true
             }
           }
         }

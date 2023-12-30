@@ -31,9 +31,6 @@ export class AbsenController {
   public async sendAbsence(req: Request, res: Response) {
     const {
       user_id,
-      guru_id,
-      pelajaran_id,
-      kelas_id,
       keterangan,
       reason,
       day,
@@ -45,12 +42,6 @@ export class AbsenController {
     const schema = Joi.object().keys({
       user_id: Joi.number().required().messages({
         "any.required": `User Id tidak boleh kosong`,
-      }),
-      guru_id: Joi.number().required().messages({
-        "any.required": `Guru Id tidak boleh kosong`,
-      }),
-      kelas_id: Joi.number().required().messages({
-        "any.required": `Kelas Id tidak boleh kosong`,
       }),
       keterangan: Joi.string().max(250).required().messages({
         "any.required": `Keterangan tidak boleh kosong`,
@@ -80,9 +71,6 @@ export class AbsenController {
       await prisma.absen.create({
         data: {
           user_id: Number(user_id),
-          guru_id: Number(guru_id),
-          pelajaran_id: Number(pelajaran_id),
-          kelas_id: Number(kelas_id),
           keterangan: keterangan,
           reason: reason,
           day: Number(day),
@@ -269,9 +257,6 @@ export class AbsenController {
       await prisma.absen.update({
         data: {
           user_id: user_id,
-          guru_id: guru_id,
-          pelajaran_id: pelajaran_id,
-          kelas_id: kelas_id,
           keterangan: keterangan,
           reason: reason,
           day: day,
@@ -292,6 +277,36 @@ export class AbsenController {
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
 
     }
+  }
+
+
+  public async findAbsenByToday(req: Request, res: Response) {
+    const { userId, day, month, year } = req.params
+
+    try {
+      let data = await prisma.absen.findFirst({
+        where: {
+          user_id: Number(userId),
+          day: Number(day),
+          month: Number(month),
+          year: Number(year)
+        }
+      })
+
+      if (data === null || data === undefined) {
+        const successRes = StatusCode.SUCCESS
+        return successResponseOnlyMessage(res, "NOT ABSEN", successRes)
+      } else {
+        const successRes = StatusCode.SUCCESS
+        return successResponseOnlyMessage(res, "ALREADY ABSEN", successRes)
+
+      }
+    } catch (err) {
+      const errorStatus = StatusCode.BAD_REQUEST
+      return failedResponse(res, true, `Something Went Wrong:${err}`, errorStatus)
+
+    }
+
   }
 
   public async absenDetailByUserIdAndMOnth(req: Request, res: Response) {

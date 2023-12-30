@@ -8,17 +8,17 @@ datasource db {
 }
 
 model absen {
-  id           Int     @id @default(autoincrement())
-  user_id      Int
-  guru_id      Int
-  pelajaran_id Int
-  kelas_id     Int
-  keterangan   String? @db.VarChar(255)
-  reason       String? @db.VarChar(255)
-  day          Int
-  month        Int
-  year         Int
-  time         String  @db.VarChar(255)
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  keterangan String? @db.VarChar(255)
+  reason     String? @db.VarChar(255)
+  day        Int
+  month      Int
+  year       Int
+  time       String  @db.VarChar(255)
+  users      users   @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "absen_ibfk_1")
+
+  @@index([user_id], map: "user_id")
 }
 
 model guru {
@@ -29,39 +29,17 @@ model guru {
   rating      Int
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model guru_users {
-  id          Int
-  nama        String  @db.VarChar(255)
-  username    String  @db.VarChar(255)
-  password    String  @db.VarChar(255)
-  status_user Int     @default(0)
-  status_role Int     @default(0)
-  user_agent  String? @db.VarChar(255)
-  profile_pic String  @default("default.jpg") @db.VarChar(255)
-  notelp      Int     @default(0)
-  kelas_id    Int?
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model jumlah {
-  id          Int
-  nomor_kelas String @db.VarChar(255)
-  wali_kelas  String @db.VarChar(255)
-  jam_kelas   String @db.VarChar(255)
-
-  @@ignore
-}
-
 model kelas {
-  id           Int         @id @default(autoincrement())
-  wali         String      @db.VarChar(255)
-  nomor        Int
-  jumlah_orang Int
-  pelajaran    pelajaran[]
-  ujian        ujian[]
+  kelas_id                    Int         @id @default(autoincrement())
+  wali_user_id                Int
+  nomor_kelas                 String      @db.VarChar(255)
+  jumlah_orang                Int
+  users                       users       @relation(fields: [wali_user_id], references: [user_id], onUpdate: Restrict, map: "kelas_ibfk_1")
+  pelajaran                   pelajaran[]
+  ujian                       ujian[]
+  users_users_kelas_idTokelas users[]     @relation("users_kelas_idTokelas")
+
+  @@index([wali_user_id], map: "wali_user_id")
 }
 
 model nilai {
@@ -85,7 +63,7 @@ model pelajaran {
   createdAt    DateTime  @db.Date
   updatedAt    DateTime? @db.Date
   users        users     @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "pelajaran_ibfk_1")
-  kelas        kelas     @relation(fields: [kelas_id], references: [id], onUpdate: Restrict, map: "pelajaran_ibfk_2")
+  kelas        kelas     @relation(fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "pelajaran_ibfk_2")
   ujian        ujian[]
 
   @@index([kelas_id], map: "kelas_id")
@@ -93,19 +71,23 @@ model pelajaran {
 }
 
 model users {
-  user_id      Int            @id @default(autoincrement())
-  nama         String         @db.VarChar(255)
-  username     String         @unique(map: "username") @db.VarChar(255)
-  password     String         @db.VarChar(255)
-  status_user  Int            @default(0)
-  status_role  Int            @default(0)
-  user_agent   String?        @db.VarChar(255)
-  profile_pic  String         @default("default.jpg") @db.VarChar(255)
-  notelp       Int            @default(0)
-  kelas_id     Int?
-  jawaban_user jawaban_user[]
-  log_ujian    log_ujian[]
-  pelajaran    pelajaran[]
+  user_id                     Int            @id @default(autoincrement())
+  nama                        String         @db.VarChar(255)
+  username                    String         @unique(map: "username") @db.VarChar(255)
+  password                    String         @db.VarChar(255)
+  status_user                 Int            @default(0)
+  user_agent                  String?        @db.VarChar(255)
+  profile_pic                 String         @default("default.jpg") @db.VarChar(255)
+  notelp                      Int            @default(0)
+  kelas_id                    Int
+  absen                       absen[]
+  jawaban_user                jawaban_user[]
+  kelas                       kelas[]
+  log_ujian                   log_ujian[]
+  pelajaran                   pelajaran[]
+  kelas_users_kelas_idTokelas kelas          @relation("users_kelas_idTokelas", fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "users_ibfk_1")
+
+  @@index([kelas_id], map: "kelas_id")
 }
 
 model todo {
@@ -114,7 +96,7 @@ model todo {
 }
 
 model ujian {
-  id             Int            @id @default(autoincrement())
+  ujian_id       Int            @id @default(autoincrement())
   nama_ujian     String         @db.VarChar(255)
   tanggal        DateTime       @db.Date
   mata_pelajaran Int
@@ -131,7 +113,7 @@ model ujian {
   updatedAt      DateTime?      @db.Date
   jawaban_user   jawaban_user[]
   pelajaran      pelajaran      @relation(fields: [mata_pelajaran], references: [pelajaran_id], onUpdate: Restrict, map: "ujian_ibfk_1")
-  kelas          kelas          @relation(fields: [kelas_id], references: [id], onUpdate: Restrict, map: "ujian_ibfk_2")
+  kelas          kelas          @relation(fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "ujian_ibfk_2")
 
   @@index([mata_pelajaran], map: "mata_pelajaran")
   @@index([kelas_id], map: "kelas_id")
@@ -160,19 +142,18 @@ model jawaban_user {
   log_history     String?  @db.Text
   submittedAt     DateTime @db.DateTime(0)
   users           users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "jawaban_user_ibfk_1")
-  ujian           ujian    @relation(fields: [ujian_id], references: [id], onUpdate: Restrict, map: "jawaban_user_ibfk_2")
+  ujian           ujian    @relation(fields: [ujian_id], references: [ujian_id], onUpdate: Restrict, map: "jawaban_user_ibfk_2")
 
   @@index([user_id], map: "user_id")
   @@index([ujian_id], map: "ujian_id")
 }
 
 model log_ujian {
-  id           Int      @id @default(autoincrement())
-  ujian_data   String   @db.VarChar(255)
-  soal_jawaban String   @db.Text
-  user_id      Int
-  createdAt    DateTime @db.Date
-  users        users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "log_ujian_ibfk_1")
+  id        Int      @id @default(autoincrement())
+  log       String   @db.VarChar(255)
+  user_id   Int
+  createdAt DateTime @db.Date
+  users     users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "log_ujian_ibfk_1")
 
   @@index([user_id], map: "user_id")
 }
@@ -183,4 +164,15 @@ model role_user {
   menu_name   String @db.VarChar(255)
   status_menu Int    @default(0)
   url_path    String @db.VarChar(255)
+}
+
+model guru_users {
+  guru_id     Int     @id @default(autoincrement())
+  nama        String  @db.VarChar(255)
+  username    String  @db.VarChar(255)
+  password    String  @db.VarChar(255)
+  status_user Int     @default(0)
+  user_agent  String? @db.VarChar(255)
+  profile_pic String  @default("default.jpg") @db.VarChar(255)
+  notelp      Int     @default(0)
 }
