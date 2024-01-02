@@ -138,7 +138,7 @@ export class AuthController {
     try {
       const result = await prisma.guru_users.findMany({
         select: {
-          id: true,
+          guru_id: true,
           nama: true,
           status_user: true,
           password: true,
@@ -164,22 +164,28 @@ export class AuthController {
             const token = jwt.sign(
               {
                 data: {
-                  id: result[0].id,
+                  id: result[0].guru_id,
                   nama: result[0].nama
                 },
               },
-              `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
+              `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '1 days' }
             );
             await prisma.guru_users.update({
               where: {
-                id: result[0].id
+                guru_id: result[0].guru_id
               },
               data: {
                 user_agent: req.headers["user-agent"]
               }
             })
             const successLogin = StatusCode.SUCCESS
-            return successResponseOnlyMessageToken(res, token, "Berhasil Login sebagai guru", successLogin)
+            // return successResponseOnlyMessageToken(res, token, "Berhasil Login sebagai guru", successLogin)
+            return res.status(200).json({
+              "status": 200,
+              "token": token,
+              "id": result[0].guru_id,
+              "message": "Berhasil Login sebagai guru"
+            })
           } else {
             const status = StatusCode.BAD_REQUEST
             return failedResponse(res, true, "Password Salah", status)
@@ -443,9 +449,9 @@ export class AuthController {
   */
   public async getUserFromStatusRole(req: Request, res: Response) {
     try {
-      const user = await prisma.users.findMany({
+      const user = await prisma.guru_users.findMany({
         select: {
-          user_id: true,
+          guru_id: true,
           nama: true,
           notelp: true,
         },

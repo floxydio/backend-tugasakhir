@@ -25,4 +25,4 @@ export class KelasController {
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
-}
+} 

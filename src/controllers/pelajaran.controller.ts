@@ -15,14 +15,29 @@ export class PelajaranController {
  * @return {object} 401 - token expired / not found
  */
   public async findAllDataPelajaran(req: Request, res: Response) {
+    const { user_id } = req.query
+
+
     try {
       // await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,pelajaran.jam,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
       //   const successRes = StatusCode.SUCCESS
       //   return successResponse(res, p, "Successfully GET Pelajaran", successRes)
       // })
       const data = await prisma.pelajaran.findMany({
-        include: {
-          kelas: true
+        where: {
+          guru_id: Number(user_id) ?? undefined
+        },
+        select: {
+          nama: true,
+          jadwal: true,
+          jam: true,
+          kelas: true,
+          users: {
+            select: {
+              nama: true,
+              guru_id: true,
+            }
+          }
         }
       })
       const successRes = StatusCode.SUCCESS
@@ -63,14 +78,14 @@ export class PelajaranController {
           nama: true,
           kelas: {
             select: {
-              id: true,
+              kelas_id: true,
               nomor_kelas: true,
 
             }
           },
           users: {
             select: {
-              user_id: true,
+              guru_id: true,
               nama: true,
             }
           }
@@ -111,7 +126,7 @@ export class PelajaranController {
           users: {
             select: {
               nama: true,
-              user_id: true,
+              guru_id: true,
 
             }
           },
@@ -172,7 +187,7 @@ export class PelajaranController {
       await prisma.pelajaran.create({
         data: {
           nama: nama,
-          user_id: Number(guruId),
+          guru_id: Number(guruId),
           kelas_id: Number(kelasId),
           jadwal: Number(jadwalId),
           jam: jam,

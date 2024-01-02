@@ -65,7 +65,7 @@ export class UjianController {
                 nama_ujian: req.body.nama_ujian,
                 durasi: Number(req.body.durasi),
                 jam_mulai: req.body.jam,
-                mata_pelajaran: Number(req.body.mapel),
+                pelajaran_id: Number(req.body.mapel),
                 tanggal: req.body.tanggal,
                 semester: Number(req.body.semester),
                 keterangan: req.body.keterangan,
@@ -105,13 +105,13 @@ export class UjianController {
         const { id } = req.params
         await prisma.ujian.update({
             where: {
-                id: Number(id)
+                ujian_id: Number(id)
             },
             data: {
                 nama_ujian: req.body.nama_ujian,
                 durasi: Number(req.body.durasi),
                 jam_mulai: req.body.jam,
-                mata_pelajaran: Number(req.body.mapel),
+                pelajaran_id: Number(req.body.mapel),
                 tanggal: req.body.tanggal,
                 keterangan: req.body.keterangan ?? "",
                 total_soal: Number(req.body.total_soal),
@@ -139,15 +139,14 @@ export class UjianController {
    */
     public async getAllUjian(req: Request, res: Response) {
         try {
-            //     const data = await prisma.$queryRaw`SELECT ujian.id,ujian.durasi,ujian.kelas_id, ujian.nama_ujian, ujian.tanggal, pelajaran.id as pelajaran_id ,pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
-            // `
             const data = await prisma.ujian.findMany({
                 include: {
                     pelajaran: {
                         select: {
                             nama: true
                         }
-                    }
+                    },
+                    kelas: true,
                 }
 
             })
@@ -171,7 +170,7 @@ export class UjianController {
             select: {
                 nama_ujian: true,
                 tanggal: true,
-                id: true,
+                ujian_id: true,
                 durasi: true,
                 jam_mulai: true,
                 status_ujian: true,
@@ -179,7 +178,7 @@ export class UjianController {
                 pelajaran: {
                     select: {
                         nama: true,
-                        user_id: true
+                        guru_id: true
                     }
                 }
             },
@@ -205,7 +204,7 @@ export class UjianController {
     public async getDetailById(req: Request, res: Response) {
         const data = await prisma.ujian.findFirst({
             where: {
-                id: Number(req.params.id)
+                ujian_id: Number(req.params.id)
             }
         })
 
@@ -220,6 +219,14 @@ export class UjianController {
         };
         return res.status(200).json({
             message: "Success get ujian detail by id",
+            durasi: data?.durasi,
+            nama_ujian: data?.nama_ujian,
+            jam_mulai: data?.jam_mulai,
+            tanggal: data?.tanggal,
+            total_soal: data?.total_soal,
+            keterangan: data?.keterangan,
+            pelajaran_id: data?.pelajaran_id,
+            kelas_id: data?.kelas_id,
             semester: data?.semester,
             soal: soal,
             essay: essay
@@ -293,7 +300,7 @@ export class UjianController {
         try {
             let questionExam = await prisma.ujian.findFirst({
                 where: {
-                    id: Number(req.params.idujian)
+                    ujian_id: Number(req.params.idujian)
                 }
             })
             let dataJawaban = await prisma.jawaban_user.findFirst({
@@ -375,7 +382,7 @@ export class UjianController {
                 include: {
                     ujian: {
                         select: {
-                            id: true,
+                            ujian_id: true,
                             nama_ujian: true
                         }
                     }
