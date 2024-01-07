@@ -134,12 +134,10 @@ export default function Routes(app: Express) {
 
   // Jawaban User
   app.get("/v2/all-exam", userAnswerController.getAnswerUser)
+  app.put("/v2/update-essay/:id/:user_id", userAnswerController.updateNilaiEssay)
 
   // Role
   app.get("/v2/role", roleController.getRole)
   app.post("/v2/create-role", roleController.createRole)
-
-  // app.get("/v2/", )  
-  // app.get("/v2/")
   //End Of Ujian
 }

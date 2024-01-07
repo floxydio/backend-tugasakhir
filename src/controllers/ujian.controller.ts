@@ -140,10 +140,20 @@ export class UjianController {
     public async getAllUjian(req: Request, res: Response) {
         try {
             const data = await prisma.ujian.findMany({
+                where: {
+                    nama_ujian: req.query.nama_ujian === undefined ? undefined : String(req.query.nama_ujian),
+                    kelas: {
+                        guru_id: req.query.guru_id === undefined ? undefined : Number(req.query.guru_id)
+                    },
+                    pelajaran: {
+                        guru_id: req.query.guru_id === undefined ? undefined : Number(req.query.guru_id)
+                    }
+                },
                 include: {
                     pelajaran: {
                         select: {
-                            nama: true
+                            guru_id: true,
+                            nama: true,
                         }
                     },
                     kelas: true,
@@ -254,7 +264,7 @@ export class UjianController {
                         total_salah: 0,
                         ujian_id: Number(req.body.idujian),
                         semester: Number(req.body.semester),
-                        user_id: decoded.data.id,
+                        siswa_id: decoded.data.id,
                         log_history: "Menunggu Review"
                     }
                 }).then(() => {
@@ -305,7 +315,7 @@ export class UjianController {
             })
             let dataJawaban = await prisma.jawaban_user.findFirst({
                 where: {
-                    user_id: Number(req.query.iduser),
+                    siswa_id: Number(req.query.iduser),
                     ujian_id: Number(req.params.idujian)
                 }
             })
@@ -335,7 +345,7 @@ export class UjianController {
             await prisma.jawaban_user.update({
                 where: {
                     jawaban_user_id: dataJawaban?.jawaban_user_id,
-                    user_id: Number(req.query.iduser),
+                    siswa_id: Number(req.query.iduser),
                 },
                 data: {
                     total_benar: countExamRight,
@@ -373,7 +383,7 @@ export class UjianController {
         try {
             const data = await prisma.jawaban_user.findMany({
                 where: {
-                    user_id: Number(req.params.userid),
+                    siswa_id: Number(req.params.userid),
                     semester: Number(req.query.semester) ?? null,
                     ujian: {
                         nama_ujian: String(req.query.nama_ujian) ?? null,
@@ -413,7 +423,7 @@ export class UjianController {
             try {
                 const data = await prisma.jawaban_user.findFirst({
                     where: {
-                        user_id: Number(decoded.data.id),
+                        siswa_id: Number(decoded.data.id),
                         ujian_id: Number(req.params.idujian)
                     }
                 })

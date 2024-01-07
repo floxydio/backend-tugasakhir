@@ -46,9 +46,9 @@ export class AuthController {
     }
 
     try {
-      const result = await prisma.users.findMany({
+      const result = await prisma.siswa.findMany({
         select: {
-          user_id: true,
+          siswa_id: true,
           nama: true,
           status_user: true,
           password: true,
@@ -75,14 +75,14 @@ export class AuthController {
             const token = jwt.sign(
               {
                 data: {
-                  id: result[0].user_id,
+                  id: result[0].siswa_id,
                   nama: result[0].nama,
                   kelas_id: result[0].kelas_id,
                 },
               },
               `${process.env.JWT_TOKEN_SECRET}`, { expiresIn: '6 days' }
             );
-            await prisma.users.update({
+            await prisma.siswa.update({
               where: {
                 username: result[0].username
               },
@@ -159,8 +159,6 @@ export class AuthController {
           const hash = result[0].password
           const compare = bcrypt.compareSync(password, hash);
           if (compare) {
-            // status_user -> [0: 'not defined', 1: 'aktif', 2: 'non aktif']
-            // status_role -> [0: 'not defined', 1: 'siswa', 2: 'guru', 3: 'admin']
             const token = jwt.sign(
               {
                 data: {
@@ -179,7 +177,7 @@ export class AuthController {
               }
             })
             const successLogin = StatusCode.SUCCESS
-            // return successResponseOnlyMessageToken(res, token, "Berhasil Login sebagai guru", successLogin)
+
             return res.status(200).json({
               "status": 200,
               "token": token,
@@ -213,9 +211,9 @@ export class AuthController {
         try {
           const salt = bcrypt.genSaltSync(saltRounds);
           const hash = bcrypt.hashSync(password, salt);
-          await prisma.users.update({
+          await prisma.siswa.update({
             where: {
-              user_id: Number(id)
+              siswa_id: Number(id)
             }, data: {
               nama: nama,
               password: hash,
@@ -231,9 +229,9 @@ export class AuthController {
         }
       } else if (password === undefined) {
         try {
-          await prisma.users.update({
+          await prisma.siswa.update({
             where: {
-              user_id: Number(id)
+              siswa_id: Number(id)
             }, data: {
               nama: nama,
               notelp: notelp,
@@ -252,9 +250,9 @@ export class AuthController {
         try {
           const salt = bcrypt.genSaltSync(saltRounds);
           const hash = bcrypt.hashSync(password, salt);
-          await prisma.users.update({
+          await prisma.siswa.update({
             where: {
-              user_id: Number(id)
+              siswa_id: Number(id)
             }, data: {
               nama: nama,
               password: hash,
@@ -271,9 +269,9 @@ export class AuthController {
         }
       } else if (password === undefined) {
         try {
-          await prisma.users.update({
+          await prisma.siswa.update({
             where: {
-              user_id: Number(id)
+              siswa_id: Number(id)
             }, data: {
               nama: nama,
               notelp: notelp,
@@ -294,12 +292,11 @@ export class AuthController {
   }
   /**
 * POST /v2/sign-up
-* @summary Create User
+* @summary Create User / Siswa
 * @tags Auth
 * @param {string} nama.form.required - form nama - application/x-www-form-urlencoded
 * @param {string} username.form.required - form username - application/x-www-form-urlencoded
 * @param {string} password.form.required - form password - application/x-www-form-urlencoded
-* @param {string} role.form.required - form role 0/1 - application/x-www-form-urlencoded
 * @return {object} 201 - success response - application/json
 * @return {object} 400 - bad request response
 * @return {object} 401 - token expired / not found
@@ -337,7 +334,7 @@ export class AuthController {
     const hash = bcrypt.hashSync(password, salt);
 
     try {
-      await prisma.users.create({
+      await prisma.siswa.create({
         data: {
           nama: nama,
           username: username,
@@ -366,7 +363,6 @@ export class AuthController {
 * @param {string} nama.form.required - form nama - application/x-www-form-urlencoded
 * @param {string} username.form.required - form username - application/x-www-form-urlencoded
 * @param {string} password.form.required - form password - application/x-www-form-urlencoded
-* @param {string} role.form.required - form role 0/1 - application/x-www-form-urlencoded
 * @return {object} 201 - success response - application/json
 * @return {object} 400 - bad request response
 * @return {object} 401 - token expired / not found
@@ -416,9 +412,9 @@ export class AuthController {
 
   public async getUserFromStatusUser(req: Request, res: Response) {
     try {
-      const user = await prisma.users.findMany({
+      const user = await prisma.siswa.findMany({
         select: {
-          user_id: true,
+          siswa_id: true,
           nama: true,
           status_user: true,
           notelp: true,
@@ -512,9 +508,9 @@ export class AuthController {
           const errorStatus = StatusCode.BAD_REQUEST
           return failedResponse(res, true, "Token Not Found", errorStatus)
         } else {
-          await prisma.users.findFirst({
+          await prisma.siswa.findFirst({
             where: {
-              user_id: decode.data.id
+              siswa_id: decode.data.id
             },
             select: {
               profile_pic: true,

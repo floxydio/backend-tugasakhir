@@ -17,12 +17,7 @@ export class PelajaranController {
   public async findAllDataPelajaran(req: Request, res: Response) {
     const { user_id } = req.query
 
-
     try {
-      // await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,pelajaran.jam,guru.nama as guru,kelas.nomor as kelas_nomor FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
-      //   const successRes = StatusCode.SUCCESS
-      //   return successResponse(res, p, "Successfully GET Pelajaran", successRes)
-      // })
       const data = await prisma.pelajaran.findMany({
         where: {
           guru_id: Number(user_id) ?? undefined
@@ -48,6 +43,9 @@ export class PelajaranController {
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
     }
   }
+
+
+
 
   /**
 * GET /v2/pelajaran/{week}/{kelas}
@@ -111,17 +109,23 @@ export class PelajaranController {
  * GET /v2/pelajaran
  * @summary Find All Pelajaran
  * @tags Pelajaran
+ * @param {number} user_id.query.required - guru id
  * @return {object} 200 - success response - application/json
  * @return {object} 400 - bad request response
  * @return {object} 401 - token expired / not found
  */
   public async findPelajaran(req: Request, res: Response) {
+    const { user_id } = req.query
+
     try {
       // await prisma.$queryRaw`SELECT kelas.id as kelas_id,guru.id as guru_id,pelajaran.id as pelajaran_id,pelajaran.nama,guru.nama as guru,kelas.nomor as kelas_nomor, pelajaran.jam FROM pelajaran LEFT JOIN guru ON pelajaran.guru_id = guru.id LEFT JOIN kelas ON pelajaran.kelas_id = kelas.id`.then((p) => {
       //   const successRes = StatusCode.SUCCESS
       //   return successResponse(res, p, "Successfully GET Pelajaran", successRes)
       // })
       const data = await prisma.pelajaran.findMany({
+        where: {
+          guru_id: Number(user_id) ?? undefined
+        },
         include: {
           users: {
             select: {
