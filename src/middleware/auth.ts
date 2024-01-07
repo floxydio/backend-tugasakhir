@@ -3,12 +3,15 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv"
 
 dotenv.config()
-
 export class middlewareAuth {
+  /**
+   * Middleware function to authenticate a token.
+   * @param req - The request object.
+   * @param res - The response object.
+   * @param next - The next function to call.
+   */
   public authenticatetoken(req: Request, res: Response, next: NextFunction) {
     const token = req.header("x-access-token");
-
-
     if (token == null) {
       return res.status(401).json({
         message: 'Token Not Found',
@@ -24,8 +27,5 @@ export class middlewareAuth {
         next();
       }
     });
-
   }
-
-
 }

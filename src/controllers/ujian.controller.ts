@@ -1,10 +1,11 @@
 import { Request, Response } from "express"
 import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse } from '../config/failed_res';
+import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import jwt from 'jsonwebtoken'
 import { prisma } from "../config/database"
 import { DataSoal, Essay, PilihanGanda, SoalGet } from "../models/ujian.dto";
+import Joi from 'joi'
 
 
 export class UjianController {
@@ -26,16 +27,50 @@ export class UjianController {
 * @return {object} 401 - token expired / not found
 */
     public async createUjian(req: Request, res: Response) {
+        const schema = Joi.object().keys({
+            nama_ujian: Joi.string().required().messages({
+                "any.required": `Nama Ujian tidak boleh kosong`,
+            }),
+            durasi: Joi.number().required().messages({
+                "any.required": "Durasi tidak boleh kosong"
+            }),
+            jam: Joi.string().required().messages({
+                "any.required": "Jam Mulai tidak boleh kosong"
+            }),
+            mapel: Joi.number().required().messages({
+                "any.required": "Mata Pelajaran ID tidak boleh kosong"
+            }),
+            tanggal: Joi.string().required().messages({
+                "any.required": "Tanggal tidak boleh kosong"
+            }),
+            keterangan: Joi.string().required().messages({
+                "any.required": "Keterangan tidak boleh kosong"
+            }),
+            total_soal: Joi.number().required().messages({
+                "any.required": "Total Soal tidak boleh kosong"
+            }),
+            kelas_id: Joi.number().required().messages({
+                "any.required": "Kelas ID tidak boleh kosong"
+            }),
+            semester: Joi.number().required().messages({
+                "any.required": "Semester tidak boleh kosong"
+            })
+        }).unknown(true)
+        const { error, value } = schema.validate(req.body)
+        if (error !== undefined) {
+            return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+        }
         await prisma.ujian.create({
             data: {
                 nama_ujian: req.body.nama_ujian,
                 durasi: Number(req.body.durasi),
                 jam_mulai: req.body.jam,
-                mata_pelajaran: Number(req.body.mapel),
+                pelajaran_id: Number(req.body.mapel),
                 tanggal: req.body.tanggal,
-                keterangan: req.body.keterangan ?? "",
+                semester: Number(req.body.semester),
+                keterangan: req.body.keterangan,
                 total_soal: Number(req.body.total_soal),
-                kelas_id: 1,
+                kelas_id: Number(req.body.kelas_id),
                 createdAt: new Date().toISOString(),
                 soal: JSON.stringify(req.body.soal),
                 essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
@@ -70,13 +105,13 @@ export class UjianController {
         const { id } = req.params
         await prisma.ujian.update({
             where: {
-                id: Number(id)
+                ujian_id: Number(id)
             },
             data: {
                 nama_ujian: req.body.nama_ujian,
                 durasi: Number(req.body.durasi),
                 jam_mulai: req.body.jam,
-                mata_pelajaran: Number(req.body.mapel),
+                pelajaran_id: Number(req.body.mapel),
                 tanggal: req.body.tanggal,
                 keterangan: req.body.keterangan ?? "",
                 total_soal: Number(req.body.total_soal),
@@ -104,8 +139,27 @@ export class UjianController {
    */
     public async getAllUjian(req: Request, res: Response) {
         try {
-            const data = await prisma.$queryRaw`SELECT ujian.id,ujian.durasi,ujian.kelas_id, ujian.nama_ujian, ujian.tanggal, pelajaran.id as pelajaran_id ,pelajaran.nama, ujian.jam_mulai,ujian.keterangan,ujian.total_soal, ujian.createdAt FROM ujian LEFT JOIN pelajaran ON pelajaran.id = ujian.mata_pelajaran;
-        `
+            const data = await prisma.ujian.findMany({
+                where: {
+                    nama_ujian: req.query.nama_ujian === undefined ? undefined : String(req.query.nama_ujian),
+                    kelas: {
+                        guru_id: req.query.guru_id === undefined ? undefined : Number(req.query.guru_id)
+                    },
+                    pelajaran: {
+                        guru_id: req.query.guru_id === undefined ? undefined : Number(req.query.guru_id)
+                    }
+                },
+                include: {
+                    pelajaran: {
+                        select: {
+                            guru_id: true,
+                            nama: true,
+                        }
+                    },
+                    kelas: true,
+                }
+
+            })
             return successResponse(res, data, "Success Get All Ujian", 200)
         } catch (e) {
             return failedResponse(res, true, `Something Went Wrong:${e}`, 400)
@@ -114,43 +168,38 @@ export class UjianController {
 
     /**
     * GET /v2/ujian/{id}
-    * @summary Find Ujian
+    * @summary Find Ujian By Detail Kelas
     * @tags Exam
-    * @param {string} id.path - id
+    * @param {string} id.path.required - id
     * @return {object} 200 - success response - application/json
     * @return {object} 400 - bad request response
     * @return {object} 401 - token expired / not found
     */
     public async getUjian(req: Request, res: Response) {
         const data = await prisma.ujian.findMany({
+            select: {
+                nama_ujian: true,
+                tanggal: true,
+                ujian_id: true,
+                durasi: true,
+                jam_mulai: true,
+                status_ujian: true,
+                total_soal: true,
+                pelajaran: {
+                    select: {
+                        nama: true,
+                        guru_id: true
+                    }
+                }
+            },
             where: {
                 kelas_id: Number(req.params.id)
-            }
+            },
+
+
         })
-        const newData: SoalGet[] = []
-        const jsonSoal: DataSoal[] = []
-        for (let i = 0; i < data.length; i++) {
-            jsonSoal.push(JSON.parse(data[i].soal))
-            const soalFromData: SoalGet = {
-                id: data[i].id,
-                nama_ujian: data[i].nama_ujian,
-                createdAt: data[i].createdAt,
-                durasi: data[i].durasi,
-                jam_mulai: data[i].jam_mulai,
-                keterangan: data[i].keterangan,
-                mata_pelajaran: data[i].mata_pelajaran,
-                status_ujian: data[i].status_ujian,
-                tanggal: data[i].tanggal,
-                kelas_id: data[i].kelas_id,
-                total_soal: data[i].total_soal
-            }
-            newData.push(soalFromData)
-        }
 
-        return successResponse(res, {
-            data_ujian: newData,
-
-        }, "Success Get Ujian", 200)
+        return successResponse(res, data, "Success Get Ujian By Detail", 200)
     }
 
     /**
@@ -165,7 +214,7 @@ export class UjianController {
     public async getDetailById(req: Request, res: Response) {
         const data = await prisma.ujian.findFirst({
             where: {
-                id: Number(req.params.id)
+                ujian_id: Number(req.params.id)
             }
         })
 
@@ -180,6 +229,15 @@ export class UjianController {
         };
         return res.status(200).json({
             message: "Success get ujian detail by id",
+            durasi: data?.durasi,
+            nama_ujian: data?.nama_ujian,
+            jam_mulai: data?.jam_mulai,
+            tanggal: data?.tanggal,
+            total_soal: data?.total_soal,
+            keterangan: data?.keterangan,
+            pelajaran_id: data?.pelajaran_id,
+            kelas_id: data?.kelas_id,
+            semester: data?.semester,
             soal: soal,
             essay: essay
         });
@@ -205,20 +263,38 @@ export class UjianController {
                         total_benar: 0,
                         total_salah: 0,
                         ujian_id: Number(req.body.idujian),
-                        user_id: decoded.data.id,
-                        log_history: JSON.stringify(log)
+                        semester: Number(req.body.semester),
+                        siswa_id: decoded.data.id,
+                        log_history: "Menunggu Review"
                     }
                 }).then(() => {
                     const status = StatusCode.CREATED
                     return successResponseOnlyMessage(res, "Successfully Submit", status)
                 }).catch((e) => {
-                    const status = StatusCode.BAD_REQUEST
-                    return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+                    if (e.code === 'P2003') {
+                        const status = StatusCode.BAD_REQUEST
+                        return failedResponse(res, true, `User Tidak Ditemukan`, status)
+                    } else {
+                        const status = StatusCode.BAD_REQUEST
+                        return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+                    }
+
                 })
             }
 
         })
     }
+
+    /**
+* GET /v2/ujian-result/{idujian}
+* @summary Find Result Exam By IdUser
+* @tags Exam
+* @param {number} idujian.path.required - id Ujian
+* @param {number} iduser.query.required - id User
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
     public async getResultExam(req: Request, res: Response) {
         if (req.query.iduser === undefined || req.params.idujian === undefined) {
             return failedResponse(res, true, `ID Ujian atau ID User Dibutuhkan`, 400)
@@ -234,12 +310,12 @@ export class UjianController {
         try {
             let questionExam = await prisma.ujian.findFirst({
                 where: {
-                    id: Number(req.params.idujian)
+                    ujian_id: Number(req.params.idujian)
                 }
             })
             let dataJawaban = await prisma.jawaban_user.findFirst({
                 where: {
-                    user_id: Number(req.query.iduser),
+                    siswa_id: Number(req.query.iduser),
                     ujian_id: Number(req.params.idujian)
                 }
             })
@@ -268,12 +344,13 @@ export class UjianController {
 
             await prisma.jawaban_user.update({
                 where: {
-                    id: dataJawaban?.id,
-                    user_id: Number(req.query.iduser),
+                    jawaban_user_id: dataJawaban?.jawaban_user_id,
+                    siswa_id: Number(req.query.iduser),
                 },
                 data: {
                     total_benar: countExamRight,
-                    total_salah: soalPilihanGanda.length - countExamRight
+                    total_salah: soalPilihanGanda.length - countExamRight,
+                    log_history: 'Selesai'
                 }
             })
 
@@ -285,13 +362,53 @@ export class UjianController {
                     total_soal_pg: soalPilihanGanda.length
                 }
             })
+        } catch (e) {
+            const status = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong ${e}`, status)
+        }
+    }
 
-
+    /**
+* GET /v2/exam-result/{userid}
+* @summary Find Ujian Result by ID User
+* @tags Exam
+* @param {string} userid.path.required - id
+* @param {number} semester.query - enum:1,2,3,4,5,6 - semester
+* @param {string} nama_ujian.query - enum:Ujian Tengah Semester,Ujian Akhir Semester,Ulangan Harian - select type
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
+    public async getResultByUserId(req: Request, res: Response) {
+        try {
+            const data = await prisma.jawaban_user.findMany({
+                where: {
+                    siswa_id: Number(req.params.userid),
+                    semester: Number(req.query.semester) ?? null,
+                    ujian: {
+                        nama_ujian: String(req.query.nama_ujian) ?? null,
+                    }
+                },
+                include: {
+                    ujian: {
+                        select: {
+                            ujian_id: true,
+                            nama_ujian: true
+                        }
+                    }
+                }
+            })
+            return res.status(200).json({
+                status: 200,
+                message: "Succesfully Get Detail Exam",
+                data: data
+            })
 
         } catch (e) {
             const status = StatusCode.BAD_REQUEST
             return failedResponse(res, true, `Something Went Wrong ${e}`, status)
         }
+
     }
 
     public async checkUserAlreadyExam(req: Request, res: Response) {
@@ -306,7 +423,7 @@ export class UjianController {
             try {
                 const data = await prisma.jawaban_user.findFirst({
                     where: {
-                        user_id: Number(decoded.data.id),
+                        siswa_id: Number(decoded.data.id),
                         ujian_id: Number(req.params.idujian)
                     }
                 })
@@ -344,7 +461,7 @@ export class UjianController {
             try {
                 const data = await prisma.jawaban_user.update({
                     where: {
-                        id: Number(req.params.id),
+                        jawaban_user_id: Number(req.params.id),
                     },
                     data: {
                         jawaban_pg: JSON.stringify(req.body.jawaban_pg),

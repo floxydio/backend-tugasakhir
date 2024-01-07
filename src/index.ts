@@ -59,11 +59,21 @@ expressJSDocSwagger(app)(options);
 
 app.listen(process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW, () => {
   prisma.$connect().then(() => {
-    console.log("Database Connected");
+    console.log(`
+    _____ _   _ _____  _____ _____            _____ _____ 
+ |_   _| \ | |_   _|/ ____/ ____|     /\   |  __ \_   _|
+   | | |  \| | | | | (___| (___      /  \  | |__) || |  
+   | | | . | | | |  \___ \\___ \    / /\ \ |  ___/ | |  
+  _| |_| |\  |_| |_ ____) |___) |  / ____ \| |    _| |_ 
+ |_____|_| \_|_____|_____/_____/  /_/    \_\_|   |_____|
+ 
+  => Database Connected
+  => Server Running on :${process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW} || ${process.env.NODE_ENV === "development" ? "Development" : "Production"} Mode
+  => Version Status :${process.env.VERSION_CURRENT}
+  => Happy Code :)
+    `)
   }).catch((err) => {
-
-    console.log("Database Connection Failed");
-    console.log(err);
+    console.log("Database Connection Failed :(");
+    process.exit(1)
   })
-  console.log(`Server Running on -> ${process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW} || ${process.env.NODE_ENV === "development" ? "Development" : "Production"} Mode`);
 });

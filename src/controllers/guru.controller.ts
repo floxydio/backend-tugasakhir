@@ -19,9 +19,7 @@ export class GuruController {
  */
   public async findAllGuru(req: Request, res: Response) {
     const { search, rating, orderby } = req.query;
-    console.log(search)
-    console.log(rating)
-    console.log(orderby)
+
     try {
       if (rating === undefined && orderby === undefined && search === undefined) {
         await prisma.guru.findMany().then((g) => {
@@ -44,7 +42,6 @@ export class GuruController {
       } else if (rating !== undefined &&
         orderby !== undefined &&
         search === undefined) {
-        console.log('ke rating')
         await prisma.guru.findMany({
           where: {
             rating: Number(rating)
@@ -55,7 +52,6 @@ export class GuruController {
             }
           ]
         }).then((g) => {
-          console.log(g)
           const successStatus = StatusCode.SUCCESS
           return successResponse(res, g, "Successfully Get Data Guru", successStatus)
         })

@@ -7,9 +7,25 @@ import { prisma } from "../config/database"
 
 
 export class UserAnswerController {
+    /**
+* GET /v2/all-exam
+* @summary Find Hasil Ujian by id guru
+* @tags Exam
+* @param {number} user_id.query.required - User Id
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
     public async getAnswerUser(req: Request, res: Response) {
         try {
             const data = await prisma.jawaban_user.findMany({
+                where: {
+                    ujian: {
+                        pelajaran: {
+                            guru_id: Number(req.query.user_id) ?? undefined
+                        }
+                    }
+                }
 
             })
             return successResponse(res, data, "Success Get Jawaban User", StatusCode.SUCCESS)
@@ -18,16 +34,45 @@ export class UserAnswerController {
         }
     }
 
-    public async updateNilaiSiswa(req: Request, res: Response) {
+    /**
+* PUT /v2/update-essay/{id}/{user_id}
+* @summary Update Nilai Essay by User ID
+* @tags Exam
+* @param {number} id.path.required - Jawaban User Id
+* @param {number} user_id.path.required - User Id
+* @param {number} total_benaressay.form.required - form data
+* @param {number} total_salahessay.form.required - form data
+* @return {object} 200 - success response - application/json
+* @return {object} 400 - bad request response
+* @return {object} 401 - token expired / not found
+*/
+    public async updateNilaiEssay(req: Request, res: Response) {
+        const { total_benaressay, total_salahessay } = req.body // Contoh hasil -> 5,  salah -> 3
+
+        const findTotalEssay = await prisma.jawaban_user.findFirst({
+            select: {
+                jawaban_essay: true,
+                total_benar: true,
+                total_salah: true
+            },
+            where: {
+                jawaban_user_id: Number(req.params.id),
+                siswa_id: Number(req.params.user_id)
+            },
+        })
+        let resultBenar = findTotalEssay?.total_benar + total_benaressay
+        let resultSalah = findTotalEssay?.total_salah + total_salahessay
+
         try {
             await prisma.jawaban_user.updateMany({
                 where: {
-                    id: Number(req.params.id),
-                    user_id: Number(req.params.user_id)
+                    jawaban_user_id: Number(req.params.id),
+                    siswa_id: Number(req.params.user_id),
                 },
                 data: {
-                    total_benar: Number(req.body.total_benar) ?? 0,
-                    total_salah: Number(req.body.total_salah) ?? 0,
+                    total_benar: resultBenar,
+                    total_salah: resultSalah,
+                    log_history: "Selesai Nilai"
                 }
             }).then((data) => {
                 return successResponse(res, data, "Success Update Nilai Siswa", StatusCode.SUCCESS)
@@ -36,6 +81,7 @@ export class UserAnswerController {
         } catch (err) {
             return failedResponse(res, true, "Failed Update Nilai Siswa", StatusCode.BAD_REQUEST)
         }
+
     }
 
 }
