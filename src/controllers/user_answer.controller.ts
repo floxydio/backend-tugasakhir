@@ -19,6 +19,26 @@ export class UserAnswerController {
     public async getAnswerUser(req: Request, res: Response) {
         try {
             const data = await prisma.jawaban_user.findMany({
+                include: {
+                    siswa: {
+                        select: {
+                            nama: true,
+                            kelas_id: true,
+                            siswa_id: true,
+                        }
+                    },
+                    ujian: {
+                        select: {
+                            pelajaran: {
+                                select: {
+                                    nama: true,
+                                    pelajaran_id: true,
+                                    guru_id: true,
+                                }
+                            }
+                        }
+                    },
+                },
                 where: {
                     ujian: {
                         pelajaran: {

@@ -35,9 +35,7 @@ export class AuthController {
         "any.required": `Password tidak boleh kosong`,
 
       }),
-      role: Joi.number().required().messages({
-        "any.required": "Role tidak boleh kosong harus di isi 0/1"
-      })
+
     }).unknown(true)
 
     const { error, value } = schema.validate(req.body)
@@ -65,7 +63,11 @@ export class AuthController {
       } else {
         if (result[0].status_user === 0 || result[0].status_user === 2) {
           const status = StatusCode.BAD_REQUEST
-          return failedResponse(res, true, "User Not Active", status)
+          return failedResponse(res, true, "User Tidak aktif", status)
+        } else if (result[0].kelas_id === null) {
+          const status = StatusCode.BAD_REQUEST
+          return failedResponse(res, true, "Kelas belum ditemukan - Hubungi Admin", status)
+
         } else {
           const hash = result[0].password
           const compare = bcrypt.compareSync(password, hash);
@@ -122,7 +124,6 @@ export class AuthController {
     const { username, password } = req.body;
     const schema = Joi.object().keys({
       username: Joi.string().required().messages({
-        "string.min": "Username harus memiliki 10 character",
         "any.required": "Username tidak boleh kosong"
       }),
       password: Joi.string().required().messages({
@@ -304,15 +305,8 @@ export class AuthController {
   public async signUp(req: Request, res: Response) {
     const { nama, username, password, kelasid, role } = req.body;
     const schema = Joi.object().keys({
-      username: Joi.when('role', {
-        is: "0", then: Joi.string().min(10).required().messages({
-          "string.min": "Username harus memiliki 10 character",
-          "any.required": "Username tidak boleh kosong"
-        })
-      }).when("role", {
-        is: "1", then: Joi.string().required().messages({
-          "any.required": "Username tidak boleh kosong"
-        })
+      username: Joi.string().required().messages({
+        "any.required": "Username tidak boleh kosong"
       }),
       nama: Joi.string().required().messages({
         "any.required": "Nama tidak boleh kosong"
@@ -321,9 +315,7 @@ export class AuthController {
         "any.required": `Password tidak boleh kosong`,
         "string.min": `Password minimal 6 huruf`
       }),
-      role: Joi.required().messages({
-        "any.required": "Role tidak boleh kosong harus di isi 0/1"
-      })
+
     })
     const { error, value } = schema.validate(req.body)
     if (error !== undefined) {
@@ -341,7 +333,6 @@ export class AuthController {
           password: hash,
           status_user: Number(1),
           user_agent: req.headers["user-agent"],
-          kelas_id: kelasid ?? 0
         }
       }).then(() => {
         const successRes = StatusCode.CREATED

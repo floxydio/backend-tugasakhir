@@ -183,6 +183,7 @@ export class UjianController {
                 ujian_id: true,
                 durasi: true,
                 jam_mulai: true,
+                keterangan: true,
                 status_ujian: true,
                 total_soal: true,
                 pelajaran: {

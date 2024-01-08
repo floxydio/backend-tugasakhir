@@ -168,11 +168,11 @@ model siswa {
   user_agent   String?        @db.VarChar(200)
   profile_pic  String         @default("default.jpg") @db.VarChar(50)
   notelp       String         @default("0") @db.VarChar(12)
-  kelas_id     Int
+  kelas_id     Int?
   absen        absen[]
   jawaban_user jawaban_user[]
   log_ujian    log_ujian[]
-  kelas        kelas          @relation(fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "siswa_ibfk_1")
+  kelas        kelas?         @relation(fields: [kelas_id], references: [kelas_id], onDelete: Restrict, onUpdate: Restrict, map: "siswa_ibfk_1")
 
   @@index([kelas_id], map: "kelas_id")
 }

@@ -19,9 +19,7 @@ export class PelajaranController {
 
     try {
       const data = await prisma.pelajaran.findMany({
-        where: {
-          guru_id: Number(user_id) ?? undefined
-        },
+
         select: {
           nama: true,
           jadwal: true,
