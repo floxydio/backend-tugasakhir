@@ -80,18 +80,17 @@ export class UserAnswerController {
                 siswa_id: Number(req.params.user_id)
             },
         })
-        let resultBenar = findTotalEssay?.total_benar + total_benaressay
-        let resultSalah = findTotalEssay?.total_salah + total_salahessay
-
+        let resultBenar = Number(findTotalEssay?.total_benar ?? 0) + Number(total_benaressay)
+        let resultSalah = Number(findTotalEssay?.total_salah ?? 0) + Number(req.body.total_salahessay)
         try {
-            await prisma.jawaban_user.updateMany({
+            await prisma.jawaban_user.update({
                 where: {
                     jawaban_user_id: Number(req.params.id),
                     siswa_id: Number(req.params.user_id),
                 },
                 data: {
-                    total_benar: resultBenar,
-                    total_salah: resultSalah,
+                    total_benar: Number(resultBenar),
+                    total_salah: Number(resultSalah),
                     log_history: "Selesai Nilai"
                 }
             }).then((data) => {
@@ -99,7 +98,8 @@ export class UserAnswerController {
             })
 
         } catch (err) {
-            return failedResponse(res, true, "Failed Update Nilai Siswa", StatusCode.BAD_REQUEST)
+            console.log()
+            return failedResponse(res, true, "Failed Update Nilai Siswa ", StatusCode.BAD_REQUEST)
         }
 
     }

@@ -256,13 +256,33 @@ export class UjianController {
                 return failedResponse(res, true, `Something Went Wrong ${error}`, status)
             } else {
                 const { jawaban_pg, jawaban_essay, log } = req.body
+                let questionExam = await prisma.ujian.findFirst({
+                    where: {
+                        ujian_id: Number(req.body.idujian)
+                    }
+                })
+                let jawabanPGSetStringify = JSON.stringify(jawaban_pg)
+                let jawabanPG: string[] = JSON.parse(jawabanPGSetStringify) ?? []
+                let soalPilihanGanda: PilihanGanda[] = []
+                let countExamRight = 0
+                if (questionExam?.soal === undefined || questionExam?.soal === "") {
+                    soalPilihanGanda = []
+                }
+                else {
+                    soalPilihanGanda = JSON.parse(questionExam.soal)
+                }
+                for (let i = 0; i < soalPilihanGanda.length; i++) {
+                    if (soalPilihanGanda[i].jawaban === jawabanPG[i]) {
+                        countExamRight++
+                    }
+                }
                 await prisma.jawaban_user.create({
                     data: {
-                        jawaban_pg: JSON.stringify(jawaban_pg),
+                        jawaban_pg: jawabanPGSetStringify,
                         jawaban_essay: JSON.stringify(jawaban_essay),
                         submittedAt: new Date().toISOString(),
-                        total_benar: 0,
-                        total_salah: 0,
+                        total_benar: countExamRight,
+                        total_salah: soalPilihanGanda.length - countExamRight,
                         ujian_id: Number(req.body.idujian),
                         semester: Number(req.body.semester),
                         siswa_id: decoded.data.id,
