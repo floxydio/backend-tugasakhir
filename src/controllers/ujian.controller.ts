@@ -130,13 +130,13 @@ export class UjianController {
     }
 
     /**
-   * GET /v2/all-ujian
-   * @summary Find All Ujian
-   * @tags Exam
-   * @return {object} 200 - success response - application/json
-   * @return {object} 400 - bad request response
-   * @return {object} 401 - token expired / not found
-   */
+ * GET /v2/all-ujian
+ * @summary Find All Ujian
+ * @tags Exam
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - bad request response
+ * @return {object} 401 - token expired / not found
+ */
     public async getAllUjian(req: Request, res: Response) {
         try {
             const data = await prisma.ujian.findMany({
@@ -403,21 +403,34 @@ export class UjianController {
     public async getResultByUserId(req: Request, res: Response) {
         try {
             const data = await prisma.jawaban_user.findMany({
-                where: {
-                    siswa_id: Number(req.params.userid),
-                    semester: Number(req.query.semester) ?? null,
-                    ujian: {
-                        nama_ujian: String(req.query.nama_ujian) ?? null,
-                    }
-                },
-                include: {
+                select: {
+                    jawaban_user_id: true,
+                    siswa_id: true,
+                    ujian_id: true,
+                    total_benar: true,
+                    total_salah: true,
+                    semester: true,
+                    log_history: true,
                     ujian: {
                         select: {
                             ujian_id: true,
-                            nama_ujian: true
+                            nama_ujian: true,
+                            pelajaran: {
+                                select: {
+                                    nama: true,
+                                    pelajaran_id: true,
+                                }
+                            },
                         }
                     }
-                }
+                },
+                orderBy: {
+                    submittedAt: 'desc'
+                },
+                where: {
+                    siswa_id: Number(req.params.userid),
+
+                },
             })
             return res.status(200).json({
                 status: 200,
