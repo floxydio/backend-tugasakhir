@@ -286,7 +286,7 @@ export class UjianController {
                         ujian_id: Number(req.body.idujian),
                         semester: Number(req.body.semester),
                         siswa_id: decoded.data.id,
-                        log_history: "Menunggu Review"
+                        log_history: log
                     }
                 }).then(() => {
                     const status = StatusCode.CREATED
