@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse, failedResponseValidation } from '../config/failed_res';
-import StatusCode from '../config/status_code';
+import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../../config/success_res';
+import { failedResponse, failedResponseValidation } from '../../config/failed_res';
+import StatusCode from '../../config/status_code';
 import Joi from 'joi'
 
-import { prisma } from "../config/database"
+import { prisma } from "../../config/database"
 export class GuruController {
 
   /**
@@ -22,17 +22,17 @@ export class GuruController {
 
     try {
       if (rating === undefined && orderby === undefined && search === undefined) {
-        await prisma.guru.findMany().then((g) => {
+        await prisma.guru_users.findMany().then((g) => {
           const successStatus = StatusCode.SUCCESS
           return successResponse(res, g, "Successfully Get Data Guru", successStatus)
         })
       } else if (rating === undefined &&
         orderby !== undefined &&
         search === undefined) {
-        await prisma.guru.findMany({
+        await prisma.guru_users.findMany({
           orderBy: [
             {
-              id: "desc"
+              guru_id: "desc"
             }
           ]
         }).then((g) => {
@@ -42,7 +42,7 @@ export class GuruController {
       } else if (rating !== undefined &&
         orderby !== undefined &&
         search === undefined) {
-        await prisma.guru.findMany({
+        await prisma.guru_users.findMany({
           where: {
             rating: Number(rating)
           },
@@ -58,7 +58,7 @@ export class GuruController {
       } else if (rating === undefined &&
         orderby === undefined &&
         search !== undefined) {
-        await prisma.guru.findMany({
+        await prisma.guru_users.findMany({
           where: {
             nama: search.toString()
           },
@@ -69,7 +69,7 @@ export class GuruController {
       } else if (rating === undefined &&
         orderby !== undefined &&
         search !== undefined) {
-        await prisma.guru.findMany({
+        await prisma.guru_users.findMany({
           where: {
             nama: search.toString()
           },
@@ -85,7 +85,7 @@ export class GuruController {
       } else if (rating !== undefined &&
         orderby !== undefined &&
         search !== undefined) {
-        await prisma.guru.findMany({
+        await prisma.guru_users.findMany({
           where: {
             nama: search.toString(),
             rating: Number(rating)
@@ -139,7 +139,7 @@ export class GuruController {
       return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
     }
     try {
-      await prisma.guru.create({
+      await prisma.guru_users.create({
         data: {
           nama: nama,
           mengajar: mengajar,
@@ -194,7 +194,7 @@ export class GuruController {
       return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
     }
     try {
-      await prisma.guru.update({
+      await prisma.guru_users.update({
         where: {
           id: Number(req.params.id)
         },

@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import { prisma } from "../config/database"
+import { prisma } from "../../config/database"
 import { Request, Response, NextFunction } from "express";
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken, successResponseOnlyMessageTokenRole } from '../config/success_res';
-import { failedResponse, failedResponseValidation } from '../config/failed_res';
-import StatusCode from '../config/status_code';
+import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken, successResponseOnlyMessageTokenRole } from '../../config/success_res';
+import { failedResponse, failedResponseValidation } from '../../config/failed_res';
+import StatusCode from '../../config/status_code';
 import dotenv from "dotenv"
 import multer, { MulterError } from "multer";
 import { v4 as uuidv4 } from 'uuid';
@@ -339,9 +339,15 @@ export class AuthController {
         return successResponseOnlyMessage(res, "Sukses Registrasi", successRes)
       })
 
-    } catch (e) {
-      const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+    } catch (e: any) {
+      if (e.code === "P2002") {
+        const failedRes = StatusCode.BAD_REQUEST
+        return failedResponse(res, true, `Username sudah digunakan`, failedRes)
+      } else {
+        const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+        return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+      }
+
     }
 
   }
@@ -394,9 +400,14 @@ export class AuthController {
         return successResponseOnlyMessage(res, "Sukses Registrasi", successRes)
       })
 
-    } catch (e) {
-      const failedRes = StatusCode.INTERNAL_SERVER_ERROR
-      return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+    } catch (e: any) {
+      if (e.code === "P2002") {
+        const failedRes = StatusCode.BAD_REQUEST
+        return failedResponse(res, true, `Username sudah digunakan`, failedRes)
+      } else {
+        const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+        return failedResponse(res, true, `Something We.nt Wrong:${e}`, failedRes)
+      }
     }
 
   }
