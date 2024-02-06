@@ -1,7 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { AuthController } from '../controllers/auth.controller';
+import { AuthController } from '../controllers/siswa_guru/auth.controller';
 import { middlewareAuth } from '../middleware/auth';
-import { GuruController } from '../controllers/siswa_guru/guru.controller';
 import { KelasController } from '../controllers/siswa_guru/kelas.controller';
 import { NilaiController } from '../controllers/siswa_guru/nilai.controller';
 import { PelajaranController } from '../controllers/siswa_guru/pelajaran.controller';
@@ -53,7 +52,6 @@ export default function Routes(app: Express) {
 
   // Controller
   const userController = new AuthController()
-  const guruController = new GuruController()
   const kelasController = new KelasController()
   const nilaiController = new NilaiController()
   const pelajaranController = new PelajaranController()
@@ -85,12 +83,6 @@ export default function Routes(app: Express) {
   });
   app.get("/v2/siswa-users", userController.getUserByMurid)
   // End Of Auth
-
-  // Guru --
-  app.get("/v2/guru", guruController.findAllGuru);
-  app.post("/v2/guru", authMiddleware, guruController.createGuru);
-  app.put("/v2/edit-guru/:id", authMiddleware, guruController.editGuru);
-  // End Of Guru
 
   // Absen --
   app.post("/v2/absen", authMiddleware, absenController.sendAbsence);

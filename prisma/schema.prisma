@@ -180,3 +180,10 @@ model admin {
   createdAt       DateTime @db.DateTime(0)
   updatedAt       DateTime @db.DateTime(0)
 }
+
+model permission {
+  id               Int       @id @default(autoincrement())
+  permission_name  String    @db.VarChar(255)
+  created_at       DateTime? @db.Date
+  updated_admin_id Int
+}
