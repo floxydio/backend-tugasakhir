@@ -12,11 +12,10 @@ export class PermissionAdminController {
 
 
     public async createPermission(req: Request, res: Response) {
-        const { permission_name, updated_admin_id } = req.body
+        const { permission_name } = req.body
 
         const schema = Joi.object({
-            permission_name: Joi.string().required(),
-            updated_admin_id: Joi.number().required()
+            permission_name: Joi.string().required()
         })
 
         const { error } = schema.validate(req.body)
@@ -27,13 +26,13 @@ export class PermissionAdminController {
         try {
             jwt.verify(req.body.token, `${process.env.JWT_SECRET_ADMIN}`, async (err: any, authData: any) => {
                 if (err) {
-                    return failedResponse(res, true, "Token is not valid", 403)
+                    return failedResponse(res, true, "Token is not valid or not found", 403)
                 } else {
                     if (authData.data.is_admin === true) {
                         const permission = await prisma.permission.create({
                             data: {
                                 permission_name: permission_name,
-                                updated_admin_id: updated_admin_id
+                                updated_admin_id: authData.data.id
                             }
                         })
 

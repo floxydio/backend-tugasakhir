@@ -11,6 +11,7 @@ import path from "path"
 import { UjianController } from '../controllers/siswa_guru/ujian.controller';
 import { UserAnswerController } from '../controllers/siswa_guru/user_answer.controller';
 import { RoleController } from '../controllers/siswa_guru/role.controller';
+import { PermissionAdminController } from '../controllers/admin/permission_admin.controller';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -59,6 +60,7 @@ export default function Routes(app: Express) {
   const ujianController = new UjianController()
   const userAnswerController = new UserAnswerController()
   const roleController = new RoleController()
+  const permissionAdminController = new PermissionAdminController()
 
   // Static
   app.use("/img-profile", express.static("src/storage/profile"))
@@ -133,4 +135,9 @@ export default function Routes(app: Express) {
   app.get("/v2/role", roleController.getRole)
   app.post("/v2/create-role", roleController.createRole)
   //End Of Ujian
+
+  // Permission
+  app.get("/v2/permission", permissionAdminController.findPermission)
+  app.post("/v2/create-permission", permissionAdminController.createPermission)
+  app.put("/v2/update-permission", permissionAdminController.updatePermission)
 }
