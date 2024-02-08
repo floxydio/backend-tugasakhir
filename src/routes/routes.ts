@@ -1,17 +1,16 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { AuthController } from '../controllers/auth.controller';
+import { AuthController } from '../controllers/siswa_guru/auth.controller';
 import { middlewareAuth } from '../middleware/auth';
-import { GuruController } from '../controllers/guru.controller';
-import { KelasController } from '../controllers/kelas.controller';
-import { NilaiController } from '../controllers/nilai.controller';
-import { PelajaranController } from '../controllers/pelajaran.controller';
-import { AbsenController } from '../controllers/absen.controller';
+import { KelasController } from '../controllers/siswa_guru/kelas.controller';
+import { NilaiController } from '../controllers/siswa_guru/nilai.controller';
+import { PelajaranController } from '../controllers/siswa_guru/pelajaran.controller';
+import { AbsenController } from '../controllers/siswa_guru/absen.controller';
 import multer from "multer"
 import { v4 as uuidv4 } from 'uuid';
 import path from "path"
-import { UjianController } from '../controllers/ujian.controller';
-import { UserAnswerController } from '../controllers/user_answer.controller';
-import { RoleController } from '../controllers/role.controller';
+import { UjianController } from '../controllers/siswa_guru/ujian.controller';
+import { UserAnswerController } from '../controllers/siswa_guru/user_answer.controller';
+import { RoleController } from '../controllers/siswa_guru/role.controller';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -53,7 +52,6 @@ export default function Routes(app: Express) {
 
   // Controller
   const userController = new AuthController()
-  const guruController = new GuruController()
   const kelasController = new KelasController()
   const nilaiController = new NilaiController()
   const pelajaranController = new PelajaranController()
@@ -85,12 +83,6 @@ export default function Routes(app: Express) {
   });
   app.get("/v2/siswa-users", userController.getUserByMurid)
   // End Of Auth
-
-  // Guru --
-  app.get("/v2/guru", guruController.findAllGuru);
-  app.post("/v2/guru", authMiddleware, guruController.createGuru);
-  app.put("/v2/edit-guru/:id", authMiddleware, guruController.editGuru);
-  // End Of Guru
 
   // Absen --
   app.post("/v2/absen", authMiddleware, absenController.sendAbsence);
@@ -134,7 +126,7 @@ export default function Routes(app: Express) {
 
   // Jawaban User
   app.get("/v2/all-exam", userAnswerController.getAnswerUser)
-  
+
   app.put("/v2/update-essay/:id/:user_id", userAnswerController.updateNilaiEssay)
 
   // Role

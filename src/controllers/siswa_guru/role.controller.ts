@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse, failedResponseValidation } from '../config/failed_res';
-import StatusCode from '../config/status_code';
-import { prisma } from "../config/database"
+import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../../config/success_res';
+import { failedResponse, failedResponseValidation } from '../../config/failed_res';
+import StatusCode from '../../config/status_code';
+import { prisma } from "../../config/database"
 import dotenv from 'dotenv'
 import Joi from 'joi'
 dotenv.config()

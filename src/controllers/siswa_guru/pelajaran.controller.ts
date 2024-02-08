@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse, failedResponseValidation } from '../config/failed_res';
-import StatusCode from '../config/status_code';
+import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../../config/success_res';
+import { failedResponse, failedResponseValidation } from '../../config/failed_res';
+import StatusCode from '../../config/status_code';
 import Joi from 'joi'
-import { prisma } from "../config/database"
+import { prisma } from "../../config/database"
 
 export class PelajaranController {
   /**

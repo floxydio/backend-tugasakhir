@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
-import { failedResponse, failedResponseValidation } from '../config/failed_res';
-import StatusCode from '../config/status_code';
+import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../../config/success_res';
+import { failedResponse, failedResponseValidation } from '../../config/failed_res';
+import StatusCode from '../../config/status_code';
 import jwt from 'jsonwebtoken'
-import { prisma } from "../config/database"
-import { DataSoal, Essay, PilihanGanda, SoalGet } from "../models/ujian.dto";
+import { prisma } from "../../config/database"
+import { DataSoal, Essay, PilihanGanda, SoalGet } from "../../models/ujian.dto";
 import Joi from 'joi'
 
 
@@ -115,7 +115,7 @@ export class UjianController {
                 tanggal: req.body.tanggal,
                 keterangan: req.body.keterangan ?? "",
                 total_soal: Number(req.body.total_soal),
-                kelas_id: 1,
+                kelas_id: Number(req.body.kelas_id),
                 soal: JSON.stringify(req.body.soal),
                 essay: JSON.stringify(req.body.essay) ?? JSON.stringify([]),
                 updatedAt: new Date().toISOString()

@@ -21,14 +21,6 @@ model absen {
   @@index([user_id], map: "user_id")
 }
 
-model guru {
-  id          Int    @id @default(autoincrement())
-  nama        String @db.VarChar(255)
-  mengajar    String @db.VarChar(255)
-  status_guru Int
-  rating      Int
-}
-
 model kelas {
   kelas_id     Int         @id @default(autoincrement())
   guru_id      Int
@@ -77,7 +69,7 @@ model todo {
 
 model ujian {
   ujian_id     Int            @id @default(autoincrement())
-  nama_ujian   String         @db.VarChar(50)
+  nama_ujian   String         @db.VarChar(30)
   tanggal      DateTime       @db.Date
   pelajaran_id Int
   durasi       Int
@@ -85,7 +77,7 @@ model ujian {
   soal         String         @db.LongText
   essay        String         @db.LongText
   jam_mulai    String         @db.VarChar(10)
-  keterangan   String         @db.VarChar(100)
+  keterangan   String         @db.VarChar(50)
   status_ujian Int            @default(0)
   total_soal   Int
   kelas_id     Int
@@ -175,4 +167,23 @@ model siswa {
   kelas        kelas?         @relation(fields: [kelas_id], references: [kelas_id], onDelete: Restrict, onUpdate: Restrict, map: "siswa_ibfk_1")
 
   @@index([kelas_id], map: "kelas_id")
+}
+
+model admin {
+  admin_id        Int      @id @default(autoincrement())
+  nama            String   @db.VarChar(50)
+  password        String   @db.VarChar(100)
+  status_user     Int
+  user_agent      String   @db.VarChar(200)
+  profile_picture String   @db.VarChar(50)
+  access_key      String   @db.VarChar(100)
+  createdAt       DateTime @db.DateTime(0)
+  updatedAt       DateTime @db.DateTime(0)
+}
+
+model permission {
+  id               Int       @id @default(autoincrement())
+  permission_name  String    @db.VarChar(255)
+  created_at       DateTime? @db.Date
+  updated_admin_id Int
 }
