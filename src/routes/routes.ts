@@ -143,9 +143,9 @@ export default function Routes(app: Express) {
   app.post("/v2/admin/sign-in", adminController.signIn)
   app.post("/v2/admin/sign-up", adminController.daftarAdmin)
   app.post("/v2/admin/create-guru", adminController.daftarGuruBaru);
-  app.post("/v2/create-pelajaran", adminController.buatPelajaran);
-  app.post("/v2/create-kelas", adminController.buatKelas);
-  app.post("/v2/create-siswa", adminController.buatSiswa);
+  app.post("/v2/admin/create-pelajaran", adminController.buatPelajaran);
+  app.post("/v2/admin/create-kelas", adminController.buatKelas);
+  app.post("/v2/admin/create-siswa", adminController.buatSiswa);
 
 
   //End Of Ujian
