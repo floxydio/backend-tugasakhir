@@ -21,19 +21,11 @@ model absen {
   @@index([user_id], map: "user_id")
 }
 
-model guru {
-  id          Int    @id @default(autoincrement())
-  nama        String @db.VarChar(255)
-  mengajar    String @db.VarChar(255)
-  status_guru Int
-  rating      Int
-}
-
 model kelas {
-  kelas_id     Int         @id @default(autoincrement())
-  guru_id      Int
-  nomor_kelas  String      @db.VarChar(10)
   jumlah_orang Int
+  guru_id      Int
+  kelas_id     Int         @id @default(autoincrement())
+  nomor_kelas  String      @db.VarChar(10)
   guru_users   guru_users  @relation(fields: [guru_id], references: [guru_id], onDelete: NoAction, onUpdate: NoAction, map: "kelas_ibfk_1")
   pelajaran    pelajaran[]
   siswa        siswa[]
@@ -54,7 +46,6 @@ model nilai {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model pelajaran {
-  pelajaran_id Int        @id @default(autoincrement())
   nama         String     @db.VarChar(50)
   guru_id      Int
   kelas_id     Int
@@ -62,6 +53,7 @@ model pelajaran {
   jam          String     @db.VarChar(10)
   createdAt    DateTime   @db.Date
   updatedAt    DateTime?  @db.Date
+  pelajaran_id Int        @id @default(autoincrement())
   users        guru_users @relation(fields: [guru_id], references: [guru_id], onUpdate: Restrict, map: "pelajaran_ibfk_1")
   kelas        kelas      @relation(fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "pelajaran_ibfk_2")
   ujian        ujian[]
@@ -76,12 +68,9 @@ model todo {
 }
 
 model ujian {
-  ujian_id     Int            @id @default(autoincrement())
   nama_ujian   String         @db.VarChar(50)
   tanggal      DateTime       @db.Date
-  pelajaran_id Int
   durasi       Int
-  semester     Int?
   soal         String         @db.LongText
   essay        String         @db.LongText
   jam_mulai    String         @db.VarChar(10)
@@ -91,6 +80,9 @@ model ujian {
   kelas_id     Int
   createdAt    DateTime       @db.Date
   updatedAt    DateTime?      @db.Date
+  pelajaran_id Int
+  semester     Int?
+  ujian_id     Int            @id @default(autoincrement())
   jawaban_user jawaban_user[]
   pelajaran    pelajaran      @relation(fields: [pelajaran_id], references: [pelajaran_id], onUpdate: Restrict, map: "ujian_ibfk_1")
   kelas        kelas          @relation(fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "ujian_ibfk_2")
@@ -111,16 +103,16 @@ model absen_guru {
 }
 
 model jawaban_user {
-  jawaban_user_id Int      @id @default(autoincrement())
-  siswa_id        Int
   jawaban_pg      String?  @db.Text
   jawaban_essay   String?  @db.Text
   ujian_id        Int
   total_benar     Int
   total_salah     Int
-  semester        Int?
   log_history     String?  @db.Text
   submittedAt     DateTime @db.DateTime(0)
+  jawaban_user_id Int      @id @default(autoincrement())
+  semester        Int?
+  siswa_id        Int
   siswa           siswa    @relation(fields: [siswa_id], references: [siswa_id], onUpdate: Restrict, map: "jawaban_user_ibfk_1")
   ujian           ujian    @relation(fields: [ujian_id], references: [ujian_id], onUpdate: Restrict, map: "jawaban_user_ibfk_2")
 
@@ -130,9 +122,9 @@ model jawaban_user {
 
 model log_ujian {
   id        Int      @id @default(autoincrement())
-  log       String   @db.VarChar(255)
   user_id   Int
   createdAt DateTime @db.Date
+  log       String   @db.VarChar(255)
   users     siswa    @relation(fields: [user_id], references: [siswa_id], onUpdate: Restrict, map: "log_ujian_ibfk_1")
 
   @@index([user_id], map: "user_id")
@@ -147,7 +139,6 @@ model role_user {
 }
 
 model guru_users {
-  guru_id     Int         @id @default(autoincrement())
   nama        String      @db.VarChar(50)
   username    String      @db.VarChar(20)
   password    String      @db.VarChar(100)
@@ -155,6 +146,7 @@ model guru_users {
   user_agent  String?     @db.VarChar(200)
   profile_pic String      @default("default.jpg") @db.VarChar(50)
   notelp      String      @default("0") @db.VarChar(12)
+  guru_id     Int         @id @default(autoincrement())
   kelas       kelas[]
   pelajaran   pelajaran[]
 }
@@ -175,4 +167,13 @@ model siswa {
   kelas        kelas          @relation(fields: [kelas_id], references: [kelas_id], onUpdate: Restrict, map: "siswa_ibfk_1")
 
   @@index([kelas_id], map: "kelas_id")
+}
+
+model admin_users {
+  admin_id   Int     @id @default(autoincrement())
+  nama       String  @db.VarChar(50)
+  username   String  @db.VarChar(20)
+  password   String  @db.VarChar(100)
+  user_agent String? @db.VarChar(200)
+  notelp     String  @default("0") @db.VarChar(12)
 }

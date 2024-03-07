@@ -1,7 +1,7 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { middlewareAuth } from '../middleware/auth';
-import { GuruController } from '../controllers/guru.controller';
+// import { GuruController } from '../controllers/guru.controller';
 import { KelasController } from '../controllers/kelas.controller';
 import { NilaiController } from '../controllers/nilai.controller';
 import { PelajaranController } from '../controllers/pelajaran.controller';
@@ -12,6 +12,7 @@ import path from "path"
 import { UjianController } from '../controllers/ujian.controller';
 import { UserAnswerController } from '../controllers/user_answer.controller';
 import { RoleController } from '../controllers/role.controller';
+import { AdminControllerAuth } from '../controllers/admin.controller';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -53,7 +54,7 @@ export default function Routes(app: Express) {
 
   // Controller
   const userController = new AuthController()
-  const guruController = new GuruController()
+  // const guruController = new GuruController()
   const kelasController = new KelasController()
   const nilaiController = new NilaiController()
   const pelajaranController = new PelajaranController()
@@ -61,6 +62,7 @@ export default function Routes(app: Express) {
   const ujianController = new UjianController()
   const userAnswerController = new UserAnswerController()
   const roleController = new RoleController()
+  const adminController = new AdminControllerAuth()
 
   // Static
   app.use("/img-profile", express.static("src/storage/profile"))
@@ -86,11 +88,6 @@ export default function Routes(app: Express) {
   app.get("/v2/siswa-users", userController.getUserByMurid)
   // End Of Auth
 
-  // Guru --
-  app.get("/v2/guru", guruController.findAllGuru);
-  app.post("/v2/guru", authMiddleware, guruController.createGuru);
-  app.put("/v2/edit-guru/:id", authMiddleware, guruController.editGuru);
-  // End Of Guru
 
   // Absen --
   app.post("/v2/absen", authMiddleware, absenController.sendAbsence);
@@ -109,7 +106,7 @@ export default function Routes(app: Express) {
   app.get("/v2/pelajaran", pelajaranController.findPelajaran);
   app.get("/v2/find-pelajaran", pelajaranController.findAllDataPelajaran);
   app.get("/v2/pelajaran/:week", authMiddleware, pelajaranController.findAllDataWeekKelas);
-  app.post("/v2/create-pelajaran", authMiddleware, pelajaranController.insertPelajaran);
+
   // End Of Pelajaran
 
   // Nilai
@@ -139,5 +136,17 @@ export default function Routes(app: Express) {
   // Role
   app.get("/v2/role", roleController.getRole)
   app.post("/v2/create-role", roleController.createRole)
+
+
+  // Admin ===========
+
+  app.post("/v2/admin/sign-in", adminController.signIn)
+  app.post("/v2/admin/sign-up", adminController.daftarAdmin)
+  app.post("/v2/admin/create-guru", adminController.daftarGuruBaru);
+  app.post("/v2/create-pelajaran", adminController.buatPelajaran);
+  app.post("/v2/create-kelas", adminController.buatKelas);
+  app.post("/v2/create-siswa", adminController.buatSiswa);
+
+
   //End Of Ujian
 }
