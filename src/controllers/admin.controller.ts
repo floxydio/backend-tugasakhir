@@ -301,4 +301,24 @@ export class AdminControllerAuth {
         }
     }
 
+    public async findAllGuru(req: Request, res: Response) {
+        try {
+            const result = await prisma.guru_users.findMany({
+                select: {
+                    guru_id: true,
+                    nama: true,
+                    username: true,
+                    status_user: true,
+                    user_agent: true,
+                    
+                }
+            })
+            const successRes = StatusCode.SUCCESS
+            return successResponse(res, result, "Success Get All Guru", successRes)
+        } catch (e) {
+            const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+            return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+        }
+    }
+
 }

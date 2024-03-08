@@ -19,13 +19,21 @@ export class KelasController {
   public async findKelas(req: Request, res: Response) {
     const { user_id } = req.query
     try {
-      let data = await prisma.kelas.findMany({
-        where: {
-          guru_id: Number(user_id) ?? undefined
-        }
-      })
-      const successRes = StatusCode.SUCCESS
-      return successResponse(res, data, "Successfully GET Kelas", successRes)
+      if (user_id === undefined) {
+        let data = await prisma.kelas.findMany()
+        const successRes = StatusCode.SUCCESS
+        return successResponse(res, data, "Successfully GET Kelas", successRes)
+      } else {
+        let data = await prisma.kelas.findMany({
+          where: {
+            guru_id: Number(user_id)
+          }
+        })
+        const successRes = StatusCode.SUCCESS
+        return successResponse(res, data, "Successfully GET Kelas", successRes)
+
+      }
+
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
       return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
