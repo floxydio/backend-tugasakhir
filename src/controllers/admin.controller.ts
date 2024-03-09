@@ -165,7 +165,7 @@ export class AdminControllerAuth {
                     username: username,
                     password: hash,
                     status_user: Number(1),
-                    user_agent: req.headers["user-agent"],
+                    user_agent: "Dummy User Agent",
                 }
             }).then(() => {
                 const successRes = StatusCode.CREATED
@@ -310,7 +310,7 @@ export class AdminControllerAuth {
                     username: true,
                     status_user: true,
                     user_agent: true,
-                    
+
                 }
             })
             const successRes = StatusCode.SUCCESS
