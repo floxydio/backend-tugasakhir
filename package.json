@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "dev-js": "nodemon --exitcrash dist/index.js",
-    "dev-prod": "tsc --build",
+    "build": "tsc --build",
     "generate": "npx prisma db pull && npx prisma generate",
     "error": "tsc --noEmit"
   },

@@ -293,7 +293,7 @@ export class AdminControllerAuth {
                     password: hash,
                     status_user: Number(1),
                     user_agent: req.headers["user-agent"],
-                    kelas_id: kelasid
+                    kelas_id: Number(kelasid)
                 }
             }).then(() => {
                 const successRes = StatusCode.CREATED
