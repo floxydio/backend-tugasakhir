@@ -271,9 +271,14 @@ export class AdminControllerAuth {
                 "any.required": `Password tidak boleh kosong`,
                 "string.min": `Password minimal 6 huruf`
             }),
+            kelasid: Joi.number().required().messages({
+                "any.required": "Kelas ID tidak boleh kosong"
+            }),
         })
+        // console.log("Ini kelas id", kelasid)
         const { error, value } = schema.validate(req.body)
         if (error !== undefined) {
+            console.log("error nih")
             return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
         }
         const saltRounds = 10;
@@ -288,12 +293,12 @@ export class AdminControllerAuth {
                     password: hash,
                     status_user: Number(1),
                     user_agent: req.headers["user-agent"],
-                    kelas_id: kelasid ?? 0
+                    kelas_id: kelasid
                 }
             }).then(() => {
                 const successRes = StatusCode.CREATED
                 return successResponseOnlyMessage(res, "Sukses Registrasi", successRes)
-            })
+            }).catch((err) => console.log(err))
 
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR

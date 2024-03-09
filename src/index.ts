@@ -59,6 +59,7 @@ expressJSDocSwagger(app)(options);
 
 app.listen(process.env.NODE_ENV === "development" ? process.env.PORT : process.env.PORT_NEW, () => {
   prisma.$connect().then(() => {
+
     console.log(`
     _____ _   _ _____  _____ _____            _____ _____ 
  |_   _| \ | |_   _|/ ____/ ____|     /\   |  __ \_   _|
