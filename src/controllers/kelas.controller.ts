@@ -20,13 +20,28 @@ export class KelasController {
     const { user_id } = req.query
     try {
       if (user_id === undefined) {
-        let data = await prisma.kelas.findMany()
+        let data = await prisma.kelas.findMany({
+          include: {
+            guru_users: {
+              select: {
+                nama: true
+              }
+            }
+          }
+        })
         const successRes = StatusCode.SUCCESS
         return successResponse(res, data, "Successfully GET Kelas", successRes)
       } else {
         let data = await prisma.kelas.findMany({
           where: {
             guru_id: Number(user_id)
+          },
+          include: {
+            guru_users: {
+              select: {
+                nama: true
+              }
+            }
           }
         })
         const successRes = StatusCode.SUCCESS
