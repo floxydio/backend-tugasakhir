@@ -317,8 +317,12 @@ export class AdminControllerAuth {
                     nama: true,
                     username: true,
                     status_user: true,
-                    kelas_id: true
-                }
+                    kelas: {
+                        select: {
+                            nomor_kelas: true
+                        }
+                    }
+                },
             })
             const successRes = StatusCode.SUCCESS
             return successResponse(res, result, "Success Get All Siswa", successRes)
