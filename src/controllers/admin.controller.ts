@@ -298,7 +298,10 @@ export class AdminControllerAuth {
             }).then(() => {
                 const successRes = StatusCode.CREATED
                 return successResponseOnlyMessage(res, "Sukses Registrasi", successRes)
-            }).catch((err) => console.log(err))
+            }).catch((err) => {
+                const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+                return failedResponse(res, true, `Something Went Wrong:${err}`, failedRes)
+            })
 
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
