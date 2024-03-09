@@ -301,6 +301,25 @@ export class AdminControllerAuth {
         }
     }
 
+    public async findAllSiswa(req: Request, res: Response) {
+        try {
+            const result = await prisma.siswa.findMany({
+                select: {
+                    siswa_id: true,
+                    nama: true,
+                    username: true,
+                    status_user: true,
+                    kelas_id: true
+                }
+            })
+            const successRes = StatusCode.SUCCESS
+            return successResponse(res, result, "Success Get All Siswa", successRes)
+        } catch (e) {
+            const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+            return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+        }
+    }
+
     public async findAllGuru(req: Request, res: Response) {
         try {
             const result = await prisma.guru_users.findMany({
