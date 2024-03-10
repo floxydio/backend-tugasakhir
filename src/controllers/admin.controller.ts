@@ -352,4 +352,140 @@ export class AdminControllerAuth {
         }
     }
 
+    public async editGuru(req: Request, res: Response) {
+        const { id } = req.params
+        const { nama, username, password, status_user } = req.body;
+        const schema = Joi.object().keys({
+            username: Joi.string().required().messages({
+                "any.required": "Username tidak boleh kosong"
+            }),
+            nama: Joi.string().required().messages({
+                "any.required": "Nama tidak boleh kosong"
+            }),
+            status_user: Joi.number().required().messages({
+                "any.required": "Status User tidak boleh kosong"
+            }),
+        })
+        const { error, value } = schema.validate(req.body)
+        if (error !== undefined) {
+            return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+        }
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, salt);
+
+        try {
+            await prisma.guru_users.update({
+                where: {
+                    guru_id: Number(id)
+                },
+                data: {
+                    nama: nama,
+                    username: username,
+                    status_user: Number(status_user)
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Sukses Update", successRes)
+            }).catch((err) => {
+                const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+                return failedResponse(res, true, `Something Went Wrong:${err}`, failedRes)
+            })
+
+        } catch (e) {
+            const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+            return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+        }
+    }
+
+    public async editSiswa(req: Request, res: Response) {
+        const { id } = req.params
+        const { nama, username, password, status_user, kelas_id } = req.body;
+        const schema = Joi.object().keys({
+            username: Joi.string().required().messages({
+                "any.required": "Username tidak boleh kosong"
+            }),
+            nama: Joi.string().required().messages({
+                "any.required": "Nama tidak boleh kosong"
+            }),
+            status_user: Joi.number().required().messages({
+                "any.required": "Status User tidak boleh kosong"
+            }),
+            kelas_id: Joi.number().required().messages({
+                "any.required": "Kelas ID tidak boleh kosong"
+            }),
+        })
+        const { error, value } = schema.validate(req.body)
+        if (error !== undefined) {
+            return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+        }
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, salt);
+
+        try {
+            await prisma.siswa.update({
+                where: {
+                    siswa_id: Number(id)
+                },
+                data: {
+                    nama: nama,
+                    username: username,
+                    status_user: Number(status_user),
+                    kelas_id: Number(kelas_id)
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Sukses Update", successRes)
+            }).catch((err) => {
+                const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+                return failedResponse(res, true, `Something Went Wrong:${err}`, failedRes)
+            })
+
+        } catch (e) {
+            const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+            return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+        }
+    }
+
+    public async editKelas(req: Request, res: Response) {
+        const { id } = req.params
+        const { jumlah_orang, guru_id, nomor_kelas } = req.body;
+
+        const schema = Joi.object().keys({
+            jumlah_orang: Joi.number().required().messages({
+                "any.required": `Jumlah Orang tidak boleh kosong`,
+            }),
+            guru_id: Joi.number().required().messages({
+                "any.required": "Guru ID tidak boleh kosong"
+            }),
+            nomor_kelas: Joi.string().required().messages({
+                "any.required": "Nomor Kelas tidak boleh kosong"
+            }),
+        }).unknown(true)
+
+        const { error, value } = schema.validate(req.body)
+        if (error !== undefined) {
+            return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+        }
+        try {
+            await prisma.kelas.update({
+                where: {
+                    kelas_id: Number(id)
+                },
+                data: {
+                    jumlah_orang: Number(jumlah_orang),
+                    guru_id: Number(guru_id),
+                    nomor_kelas: nomor_kelas
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Successfully Update Kelas", successRes)
+            })
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
+    }
+
 }
