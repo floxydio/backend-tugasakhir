@@ -48,7 +48,11 @@ const prisma = new PrismaClient()
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 50000 }));
 app.use(cors());
-app.use(helmet())
+app.use(helmet(
+  {
+    hidePoweredBy: true
+  }
+))
 app.use(compression())
 // app.use(limiter)
 
