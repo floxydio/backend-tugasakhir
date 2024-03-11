@@ -488,4 +488,55 @@ export class AdminControllerAuth {
         }
     }
 
+    public async deleteGuru(req: Request, res: Response) {
+        const { id } = req.params
+        try {
+            await prisma.guru_users.delete({
+                where: {
+                    guru_id: Number(id)
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Successfully Delete Guru", successRes)
+            })
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
+    }
+
+    public async deleteSiswa(req: Request, res: Response) {
+        const { id } = req.params
+        try {
+            await prisma.siswa.delete({
+                where: {
+                    siswa_id: Number(id)
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Successfully Delete Siswa", successRes)
+            })
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
+    }
+
+    public async deleteKelas(req: Request, res: Response) {
+        const { id } = req.params
+        try {
+            await prisma.kelas.delete({
+                where: {
+                    kelas_id: Number(id)
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Successfully Delete Kelas", successRes)
+            })
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
+    }
+
 }

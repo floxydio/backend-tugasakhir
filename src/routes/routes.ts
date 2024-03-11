@@ -152,6 +152,9 @@ export default function Routes(app: Express) {
   app.put("/v2/admin/edit-siswa/:id", adminController.editSiswa)
   app.put("/v2/admin/edit-kelas/:id", adminController.editKelas)
 
+  app.delete("/v2/admin/delete-guru/:id", adminController.deleteGuru)
+  app.delete("/v2/admin/delete-siswa/:id", adminController.deleteSiswa)
+  app.delete("/v2/admin/delete-kelas/:id", adminController.deleteKelas)
 
   //End Of Ujian
 }
