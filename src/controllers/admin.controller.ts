@@ -370,9 +370,9 @@ export class AdminControllerAuth {
         if (error !== undefined) {
             return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
         }
-        const saltRounds = 10;
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hash = bcrypt.hashSync(password, salt);
+        // const saltRounds = 10;
+        // const salt = bcrypt.genSaltSync(saltRounds);
+        // const hash = bcrypt.hashSync(password, salt);
 
         try {
             await prisma.guru_users.update({
