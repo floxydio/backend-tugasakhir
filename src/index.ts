@@ -50,7 +50,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 5
 app.use(cors());
 app.use(helmet())
 app.use(compression())
-app.use(limiter)
+// app.use(limiter)
 
 
 Routes(app);
