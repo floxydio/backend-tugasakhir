@@ -34,9 +34,6 @@ export class AuthController {
       password: Joi.string().required().messages({
         "any.required": `Password tidak boleh kosong`,
 
-      }),
-      role: Joi.number().required().messages({
-        "any.required": "Role tidak boleh kosong harus di isi 0/1"
       })
     }).unknown(true)
 
