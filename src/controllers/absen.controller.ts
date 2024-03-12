@@ -314,10 +314,21 @@ export class AbsenController {
     const month = req.params.month
 
     try {
-      await prisma.$queryRaw`SELECT absen.id, users.nama as nama_user,guru.nama as nama_guru,pelajaran.nama as pelajaran_nama,kelas.nomor as nomor_kelas,absen.keterangan,absen.day,absen.month,absen.year,absen.time,absen.reason FROM absen LEFT JOIN users ON absen.user_id = users.id LEFT JOIN pelajaran ON absen.pelajaran_id = pelajaran.id LEFT JOIN kelas ON absen.kelas_id = kelas.nomor LEFT JOIN guru ON absen.guru_id = guru.id WHERE absen.user_id = ${id} AND absen.month = ${month}`.then((a) => {
-        const successRes = StatusCode.SUCCESS
-        return successResponse(res, a, "Successfully Get Absen", successRes)
+      // await prisma.$queryRaw`SELECT absen.id, users.nama as nama_user,guru.nama as nama_guru,pelajaran.nama as pelajaran_nama,kelas.nomor as nomor_kelas,absen.keterangan,absen.day,absen.month,absen.year,absen.time,absen.reason FROM absen LEFT JOIN users ON absen.user_id = users.id LEFT JOIN pelajaran ON absen.pelajaran_id = pelajaran.id LEFT JOIN kelas ON absen.kelas_id = kelas.nomor LEFT JOIN guru ON absen.guru_id = guru.id WHERE absen.user_id = ${id} AND absen.month = ${month}`.then((a) => {
+      //   const successRes = StatusCode.SUCCESS
+      //   return successResponse(res, a, "Successfully Get Absen", successRes)
+      // })
+
+      // Refactor
+      let data = await prisma.absen.findMany({
+        where: {
+          user_id: Number(id),
+          month: Number(month)
+        }
       })
+
+      const successRes = StatusCode.SUCCESS
+      return successResponse(res, data, "Successfully Get Absen", successRes)
 
     } catch (e) {
       const errorStatus = StatusCode.BAD_REQUEST
@@ -381,6 +392,8 @@ export class AbsenController {
     }
 
   }
+
+
 
 
 }

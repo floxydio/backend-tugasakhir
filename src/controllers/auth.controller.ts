@@ -88,7 +88,7 @@ export class AuthController {
               }
             })
             const successLogin = StatusCode.SUCCESS
-            return successResponseOnlyMessageToken(res, token, "Berhasil Login", successLogin)
+            return successResponseOnlyMessageToken(res, result[0].siswa_id, token, "Berhasil Login", successLogin)
           } else {
             const status = StatusCode.BAD_REQUEST
             return failedResponse(res, true, "Password Salah", status)
