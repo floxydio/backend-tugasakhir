@@ -156,5 +156,8 @@ export default function Routes(app: Express) {
   app.delete("/v2/admin/delete-siswa/:id", adminController.deleteSiswa)
   app.delete("/v2/admin/delete-kelas/:id", adminController.deleteKelas)
 
+  app.get("/v2/admin/find-pelajaran", adminController.findMapel)
+  app.delete("/v2/admin/del-pelajaran/:id", adminController.deleteMapelById)
+
   //End Of Ujian
 }

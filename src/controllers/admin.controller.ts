@@ -178,6 +178,82 @@ export class AdminControllerAuth {
         }
     }
 
+    public async findMapel(req: Request, res: Response) {
+        try {
+            const result = await prisma.pelajaran.findMany()
+            const successRes = StatusCode.SUCCESS
+            return successResponse(res, result, "Success Get All Mapel", successRes)
+        } catch (e) {
+            const failedRes = StatusCode.INTERNAL_SERVER_ERROR
+            return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
+        }
+    }
+
+    public async updateMapel(req: Request, res: Response) {
+        const { id } = req.params
+        const { nama, guruId, kelasId, jadwal, jam, createdAt } = req.body;
+        const schema = Joi.object().keys({
+            nama: Joi.string().required().messages({
+                "any.required": `Nama tidak boleh kosong`,
+            }),
+            guruId: Joi.number().required().messages({
+                "any.required": "Guru ID tidak boleh kosong"
+            }),
+            kelasId: Joi.number().required().messages({
+                "any.required": "Kelas ID tidak boleh kosong"
+            }),
+            jadwal: Joi.number().required().messages({
+                "any.required": "Jadwal ID tidak boleh kosong"
+            }),
+            jam: Joi.string().regex(RegExp('^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$')).required().messages({
+                "any.required": "Jam tidak boleh kosong",
+                "string.pattern.base": "Waktu tidak sesuai - Contoh 17:00"
+            })
+        }).unknown(true)
+        const { error, value } = schema.validate(req.body)
+        if (error !== undefined) {
+            return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
+        }
+        try {
+            await prisma.pelajaran.update({
+                where: {
+                    pelajaran_id: Number(id)
+                },
+                data: {
+                    nama: nama,
+                    guru_id: Number(guruId),
+                    kelas_id: Number(kelasId),
+                    jadwal: Number(jadwal),
+                    jam: jam,
+                    createdAt: createdAt ?? new Date()
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Successfully Update Mapel", successRes)
+            })
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
+    }
+
+    public async deleteMapelById(req: Request, res: Response) {
+        const { id } = req.params
+        try {
+            await prisma.pelajaran.delete({
+                where: {
+                    pelajaran_id: Number(id)
+                }
+            }).then(() => {
+                const successRes = StatusCode.SUCCESS
+                return successResponseOnlyMessage(res, "Successfully Delete Mapel", successRes)
+            })
+        } catch (e) {
+            const errorStatus = StatusCode.BAD_REQUEST
+            return failedResponse(res, true, `Something Went Wrong:${e}`, errorStatus)
+        }
+    }
+
     public async buatPelajaran(req: Request, res: Response) {
         const { nama, guruId, kelasId, jadwal, jam, createdAt } = req.body;
         const schema = Joi.object().keys({
