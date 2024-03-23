@@ -476,7 +476,7 @@ export class AdminControllerAuth {
 
     public async editSiswa(req: Request, res: Response) {
         const { id } = req.params
-        const { nama, username, password, status_user, kelas_id } = req.body;
+        const { nama, username, status_user, kelas_id } = req.body;
         const schema = Joi.object().keys({
             username: Joi.string().required().messages({
                 "any.required": "Username tidak boleh kosong"
@@ -495,9 +495,6 @@ export class AdminControllerAuth {
         if (error !== undefined) {
             return failedResponseValidation(res, true, error?.details.map((e) => e.message).join(","), 400)
         }
-        const saltRounds = 10;
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hash = bcrypt.hashSync(password, salt);
 
         try {
             await prisma.siswa.update({
@@ -507,7 +504,7 @@ export class AdminControllerAuth {
                 data: {
                     nama: nama,
                     username: username,
-                    status_user: Number(status_user),
+                    status_user: 1,
                     kelas_id: Number(kelas_id)
                 }
             }).then(() => {
