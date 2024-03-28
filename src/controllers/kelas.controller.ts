@@ -52,7 +52,7 @@ export class KelasController {
           limit: Number(limit),
           message: "Successfully GET Kelas"
         }
-        return successResponse(res, resMessage, "Successfully GET Kelas", successRes)
+        return res.status(200).json(resMessage)
       } else {
         let data = await prisma.kelas.findMany({
           where: {
@@ -78,8 +78,7 @@ export class KelasController {
           limit: Number(limit),
           message: "Successfully GET Kelas"
         }
-        return successResponse(res, resMessage, "Successfully GET Kelas", successRes)
-
+        return res.status(200).json(resMessage)
       }
 
     } catch (e) {

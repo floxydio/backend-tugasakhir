@@ -224,7 +224,8 @@ export class AdminControllerAuth {
                 message: "Success Get All Mapel"
             }
 
-            return successResponse(res, resMessage, "Success Get All Mapel", successRes)
+            // return successResponse(res, resMessage, "Success Get All Mapel", successRes)
+            return res.status(200).json(resMessage)
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
             return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
@@ -466,7 +467,7 @@ export class AdminControllerAuth {
                 limit: Number(limit),
                 message: "Success Get All Siswa"
             }
-            return successResponse(res, resMessage, "Success Get All Siswa", successRes)
+            return res.status(200).json(resMessage)
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
             return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
@@ -510,7 +511,7 @@ export class AdminControllerAuth {
                 limit: Number(limit),
                 message: "Success Get All Guru"
             }
-            return successResponse(res, resMessage, "Success Get All Guru", successRes)
+            return res.status(200).json(resMessage)
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
             return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
