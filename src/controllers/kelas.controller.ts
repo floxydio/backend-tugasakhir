@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
+import { ResponseModelWithPageTotalResultAndLimit, successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
 import { failedResponse } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 
@@ -17,7 +17,18 @@ export class KelasController {
 * @return {object} 401 - token expired / not found
 */
   public async findKelas(req: Request, res: Response) {
-    const { user_id } = req.query
+    let { page, limit, user_id } = req.query;
+
+    if (!limit) {
+      limit = "5"
+    }
+    if (!page) {
+      page = "1"
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const totalData = await prisma.kelas.count();
+    const totalPage = Math.ceil(totalData / Number(limit));
     try {
       if (user_id === undefined) {
         let data = await prisma.kelas.findMany({
@@ -27,10 +38,21 @@ export class KelasController {
                 nama: true
               }
             }
-          }
+          },
+          take: Number(limit),
+          skip: skip
         })
         const successRes = StatusCode.SUCCESS
-        return successResponse(res, data, "Successfully GET Kelas", successRes)
+        let resMessage: ResponseModelWithPageTotalResultAndLimit = {
+          status: successRes,
+          error: false,
+          data: data,
+          total_page: totalPage,
+          total_result: totalData,
+          limit: Number(limit),
+          message: "Successfully GET Kelas"
+        }
+        return successResponse(res, resMessage, "Successfully GET Kelas", successRes)
       } else {
         let data = await prisma.kelas.findMany({
           where: {
@@ -42,10 +64,21 @@ export class KelasController {
                 nama: true
               }
             }
-          }
+          },
+          take: Number(limit),
+          skip: skip
         })
         const successRes = StatusCode.SUCCESS
-        return successResponse(res, data, "Successfully GET Kelas", successRes)
+        let resMessage: ResponseModelWithPageTotalResultAndLimit = {
+          status: successRes,
+          error: false,
+          data: data,
+          total_page: totalPage,
+          total_result: totalData,
+          limit: Number(limit),
+          message: "Successfully GET Kelas"
+        }
+        return successResponse(res, resMessage, "Successfully GET Kelas", successRes)
 
       }
 

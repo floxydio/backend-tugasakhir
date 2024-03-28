@@ -1,6 +1,6 @@
 
 import { Request, Response } from "express"
-import { successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
+import { ResponseModelWithPageTotalResultAndLimit, successResponse, successResponseOnlyMessage, successResponseOnlyMessageToken, successResponseWithToken } from '../config/success_res';
 import { failedResponse, failedResponseValidation } from '../config/failed_res';
 import StatusCode from '../config/status_code';
 import bcrypt from "bcrypt"
@@ -179,10 +179,52 @@ export class AdminControllerAuth {
     }
 
     public async findMapel(req: Request, res: Response) {
+        let { page, limit } = req.query;
+
+        if (!limit) {
+            limit = "5"
+        }
+        if (!page) {
+            page = "1"
+        }
+
+        const skip = (Number(page) - 1) * Number(limit);
+        const totalData = await prisma.pelajaran.count();
+        const totalPage = Math.ceil(totalData / Number(limit));
         try {
-            const result = await prisma.pelajaran.findMany()
+            const result = await prisma.pelajaran.findMany(
+                {
+                    include: {
+                        users: {
+                            select: {
+                                nama: true,
+                                guru_id: true,
+                            }
+                        },
+                        kelas: {
+                            select: {
+                                kelas_id: true,
+                                nomor_kelas: true,
+
+                            }
+                        }
+                    },
+                    skip: skip,
+                    take: Number(limit),
+                }
+            )
             const successRes = StatusCode.SUCCESS
-            return successResponse(res, result, "Success Get All Mapel", successRes)
+            let resMessage: ResponseModelWithPageTotalResultAndLimit = {
+                status: successRes,
+                error: false,
+                data: result,
+                total_page: totalPage,
+                total_result: totalData,
+                limit: Number(limit),
+                message: "Success Get All Mapel"
+            }
+
+            return successResponse(res, resMessage, "Success Get All Mapel", successRes)
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
             return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
@@ -386,6 +428,18 @@ export class AdminControllerAuth {
     }
 
     public async findAllSiswa(req: Request, res: Response) {
+        let { page, limit } = req.query;
+
+        if (!limit) {
+            limit = "5"
+        }
+        if (!page) {
+            page = "1"
+        }
+
+        const skip = (Number(page) - 1) * Number(limit);
+        const totalData = await prisma.siswa.count();
+        const totalPage = Math.ceil(totalData / Number(limit));
         try {
             const result = await prisma.siswa.findMany({
                 select: {
@@ -399,9 +453,20 @@ export class AdminControllerAuth {
                         }
                     }
                 },
+                take: Number(limit),
+                skip: skip
             })
             const successRes = StatusCode.SUCCESS
-            return successResponse(res, result, "Success Get All Siswa", successRes)
+            let resMessage: ResponseModelWithPageTotalResultAndLimit = {
+                status: successRes,
+                error: false,
+                data: result,
+                total_page: totalPage,
+                total_result: totalData,
+                limit: Number(limit),
+                message: "Success Get All Siswa"
+            }
+            return successResponse(res, resMessage, "Success Get All Siswa", successRes)
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
             return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)
@@ -409,6 +474,19 @@ export class AdminControllerAuth {
     }
 
     public async findAllGuru(req: Request, res: Response) {
+
+        let { page, limit } = req.query;
+
+        if (!limit) {
+            limit = "5"
+        }
+        if (!page) {
+            page = "1"
+        }
+
+        const skip = (Number(page) - 1) * Number(limit);
+        const totalData = await prisma.guru_users.count();
+        const totalPage = Math.ceil(totalData / Number(limit));
         try {
             const result = await prisma.guru_users.findMany({
                 select: {
@@ -418,10 +496,21 @@ export class AdminControllerAuth {
                     status_user: true,
                     user_agent: true,
 
-                }
+                },
+                take: Number(limit),
+                skip: skip
             })
             const successRes = StatusCode.SUCCESS
-            return successResponse(res, result, "Success Get All Guru", successRes)
+            let resMessage: ResponseModelWithPageTotalResultAndLimit = {
+                status: successRes,
+                error: false,
+                data: result,
+                total_page: totalPage,
+                total_result: totalData,
+                limit: Number(limit),
+                message: "Success Get All Guru"
+            }
+            return successResponse(res, resMessage, "Success Get All Guru", successRes)
         } catch (e) {
             const failedRes = StatusCode.INTERNAL_SERVER_ERROR
             return failedResponse(res, true, `Something Went Wrong:${e}`, failedRes)

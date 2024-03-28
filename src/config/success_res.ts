@@ -17,6 +17,16 @@ export const successResponseWithToken = (res: Response, data: any, token: string
     })
 }
 
+export interface ResponseModelWithPageTotalResultAndLimit {
+    status: number;
+    error: false;
+    data: any;
+    total_page: number;
+    total_result: number;
+    limit: number;
+    message: string;
+}
+
 export const successResponseOnlyMessageToken = (res: Response, user_id: number, token: string, message: string, status: number) => {
     return res.status(status).json({
         status,
